@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ZenFlow Yoga Studio</title>
+<script src="https://cdn.tailwindcss.com/3.4.16"></script>
+<script>
+tailwind.config = {
+  theme: {
+    extend: {
+      colors: {
+        primary: '#2E8B57',
+        secondary: '#FFAD60',
+        accent: '#6C63FF',
+        darkEmerald: '#176B4D',
+      },
+      borderRadius: {
+        'button': '8px'
+      },
+      keyframes: {
+        slideInLeft: {
+          '0%': { transform: 'translateX(-100%)', opacity: '0' },
+          '100%': { transform: 'translateX(0)', opacity: '1' },
+        },
+        slideUp: {
+          '0%': { transform: 'translateY(20px)', opacity: '0' },
+          '100%': { transform: 'translateY(0)', opacity: '1' },
+        },
+      },
+      animation: {
+        slideInLeft: 'slideInLeft 1s ease-out',
+        slideUp: 'slideUp 1s ease-out',
+      },
+    }
+  }
+}
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.6.0/remixicon.min.css">
+<style>
+body {
+  font-family: 'Poppins', sans-serif;
+  background-color: #F8F8F8;
+  color: #333;
+}
+.nav-link {
+  position: relative;
+}
+.nav-link::after {
+  content: '';
+  position: absolute;
+  width: 0;
+  height: 2px;
+  bottom: -2px;
+  left: 0;
+  background-color: #2E8B57;
+  transition: width 0.3s ease;
+}
+.nav-link:hover::after {
+  width: 100%;
+}
+.hero-section {
+  background: linear-gradient(to right, rgba(255,255,255,0.9) 50%, rgba(255,255,255,0.8) 100%);
+  position: relative;
+  overflow: hidden;
+  
+}
+.hero-image {
+  position: absolute;
+  right: 0;
+  top: 0;
+  width: 50%;
+  height: 100%;
+  object-fit: cover;
+  z-index: -1;
+}
+.benefit-card {
+  transition: transform 0.3s ease;
+}
+.benefit-card:hover {
+  transform: translateY(-5px);
+}
+.cta-button {
+  background: linear-gradient(45deg, #2E8B57, #3da067);
+  transition: transform 0.3s ease;
+}
+.cta-button:hover {
+  transform: translateY(-2px);
+}
+</style>
+</head>
+<body>
+<header class="bg-white shadow-sm fixed w-full top-0 z-50">
+  <nav class="container mx-auto px-6 py-4 flex items-center justify-between">
+    <h1 class="font-['Pacifico'] text-3xl text-primary">ZenFlow</h1>
+    <div class="hidden md:flex items-center space-x-8">
+      <a href="/index.html" class="nav-link text-gray-700 hover:text-primary transition-colors">Home</a>
+      <a href="/services" class="nav-link text-gray-700 hover:text-primary transition-colors" href="/services">Attendance</a>
+      <a href="/about" class="nav-link text-gray-700 hover:text-primary transition-colors" href="/about">About</a>
+      <a href="/contact" class="nav-link text-gray-700 hover:text-primary transition-colors" href="/contact">Contact</a>
+      <button class="bg-accent text-white px-6 py-2 !rounded-button shadow hover:bg-accent/90 transition-all whitespace-nowrap">
+        Get Started
+      </button>
+    </div>
+    <button class="md:hidden w-10 h-10 flex items-center justify-center">
+      <i class="ri-menu-line text-2xl"></i>
+    </button>
+  </nav>
+</header>
+<main class="mt-20">
+<section class="hero-section min-h-[600px] flex items-center bg-darkEmerald text-white">
+  <div class="container mx-auto px-6 py-20 flex flex-col md:flex-row items-center gap-10">
+    <!-- Text Content -->
+    <div class="max-w-xl animate-slideInLeft md:w-1/2 text-black">
+  <h2 class="text-4xl md:text-5xl font-semibold mb-6">
+    Hello {{variable}}
+  </h2>
+  <h2 class="text-4xl md:text-5xl font-semibold mb-6">
+    Find Your Inner Peace Through Yoga
+  </h2>
+  <p class="text-lg mb-8">
+    Join our mindful community and transform your life with expert-led yoga classes. Experience the perfect blend of physical practice and spiritual wellness.
+  </p>
+      <div class="flex gap-4">
+        <button class="cta-button text-white px-8 py-3 !rounded-button shadow-lg whitespace-nowrap">
+          Start Your Journey
+        </button>
+        <button class="bg-white text-primary px-8 py-3 !rounded-button shadow border border-primary hover:bg-gray-50 transition-colors whitespace-nowrap">
+          Learn More
+        </button>
+      </div>
+    </div>
+    <!-- Image Content -->
+    <div class="md:w-1/2 h-[600px] md:h-auto">
+      <img
+        src="911f064f7b4ee120be4303521325a90d.jpg"
+        alt="Yoga Meditation"
+        class="w-full h-full rounded-lg shadow-2xl object-cover"
+      />
+    </div>
+  </div>
+</section>
+
+  <section class="py-20 bg-white">
+    <div class="container mx-auto px-6">
+      <div class="text-center mb-16">
+        <h2 class="text-3xl font-semibold text-gray-800 mb-4">Why Choose Our Yoga Studio?</h2>
+        <p class="text-gray-600 max-w-2xl mx-auto">
+          We offer a unique approach to yoga that combines traditional practices with modern wellness techniques.
+        </p>
+      </div>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div class="benefit-card bg-secondary/10 p-8 rounded-lg text-center animate-slideUp">
+          <div class="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-6">
+            <i class="ri-heart-line text-2xl text-primary"></i>
+          </div>
+          <h3 class="text-xl font-semibold text-gray-800 mb-4">Holistic Approach</h3>
+          <p class="text-gray-600">
+            Our classes focus on both physical and mental well-being, helping you achieve complete harmony.
+          </p>
+        </div>
+        <div class="benefit-card bg-accent/10 p-8 rounded-lg text-center animate-slideUp">
+          <div class="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-6">
+            <i class="ri-user-star-line text-2xl text-primary"></i>
+          </div>
+          <h3 class="text-xl font-semibold text-gray-800 mb-4">Expert Instructors</h3>
+          <p class="text-gray-600">
+            Learn from certified yoga teachers with years of experience in various yoga styles.
+          </p>
+        </div>
+        <div class="benefit-card bg-primary/10 p-8 rounded-lg text-center animate-slideUp">
+          <div class="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-6">
+            <i class="ri-community-line text-2xl text-primary"></i>
+          </div>
+          <h3 class="text-xl font-semibold text-gray-800 mb-4">Supportive Community</h3>
+          <p class="text-gray-600">
+            Join a welcoming community of like-minded individuals on their wellness journey.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+<footer class="bg-primary text-white py-12 animate-slideUp">
+  <div class="container mx-auto px-6">
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+      <div>
+        <h3 class="font-['Pacifico'] text-2xl mb-4">ZenFlow</h3>
+        <p class="text-white/70">
+          Transforming lives through the practice of yoga and mindfulness.
+        </p>
+      </div>
+      <div>
+        <h4 class="text-lg font-semibold mb-4">Quick Links</h4>
+        <ul class="space-y-2">
+          <li><a href="#" class="text-white/70 hover:text-white transition-colors">Classes</a></li>
+          <li><a href="#" class="text-white/70 hover:text-white transition-colors">Schedule</a></li>
+          <li><a href="#" class="text-white/70 hover:text-white transition-colors">Pricing</a></li>
+          <li><a href="#" class="text-white/70 hover:text-white transition-colors">Workshops</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4 class="text-lg font-semibold mb-4">Contact</h4>
+        <ul class="space-y-2">
+          <li class="flex items-center">
+            <i class="ri-map-pin-line mr-2"></i>
+            <span class="text-white/70">123 Yoga Street, Zen City</span>
+          </li>
+          <li class="flex items-center">
+            <i class="ri-phone-line mr-2"></i>
+            <span class="text-white/70">+1 234 567 8900</span>
+          </li>
+          <li class="flex items-center">
+            <i class="ri-mail-line mr-2"></i>
+            <span class="text-white/70">info@yogastudio.com</span>
+          </li>
+        </ul>
+      </div>
+      <div>
+        <h4 class="text-lg font-semibold mb-4">Follow Us</h4>
+        <div class="flex space-x-4">
+          <a href="#" class="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-accent transition-colors">
+            <i class="ri-facebook-fill"></i>
+          </a>
+          <a href="#" class="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-accent transition-colors">
+            <i class="ri-instagram-fill"></i>
+          </a>
+          <a href="#" class="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-accent transition-colors">
+            <i class="ri-twitter-fill"></i>
+          </a>
+          <a href="#" class="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-accent transition-colors">
+            <i class="ri-youtube-fill"></i>
+          </a>
+        </div>
+      </div>
+    </div>
+    <div class="border-t border-white/10 mt-12 pt-8 flex flex-col md:flex-row justify-between items-center">
+      <p class="text-white/70 text-sm">© 2025 Yoga Studio. All rights reserved.</p>
+      <div class="flex space-x-6 mt-4 md:mt-0">
+        <a href="#" class="text-white/70 hover:text-white transition-colors text-sm">Privacy Policy</a>
+        <a href="#" class="text-white/70 hover:text-white transition-colors text-sm">Terms of Service</a>
+        <a href="#" class="text-white/70 hover:text-white transition-colors text-sm">Cookie Policy</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>
