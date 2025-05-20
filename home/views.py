@@ -6,9 +6,9 @@ def index(request):
     return render(request,"index.html",context)
     #return HttpResponse("this is my homepage")
 def about(request):
-    return HttpResponse("this is my about")
-def services(request):
-    return HttpResponse("this is my service page")
+    return render(request,"about.html")
 def contact(request):
+   return render(request,"contact.html")
+def services(request):
     return HttpResponse("this is my contact page")
 # Create your views here.

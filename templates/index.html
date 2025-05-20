@@ -98,10 +98,10 @@ body {
   <nav class="container mx-auto px-6 py-4 flex items-center justify-between">
     <h1 class="font-['Pacifico'] text-3xl text-primary">ZenFlow</h1>
     <div class="hidden md:flex items-center space-x-8">
-      <a href="index.html" class="nav-link text-gray-700 hover:text-primary transition-colors">Home</a>
+      <a href="{% url 'home' %}" class="nav-link text-gray-700 hover:text-primary transition-colors">Home</a>
       <a href="/services" class="nav-link text-gray-700 hover:text-primary transition-colors" href="/services">Attendance</a>
-      <a href="about.html" class="nav-link text-gray-700 hover:text-primary transition-colors" >About</a>
-      <a href="/contact" class="nav-link text-gray-700 hover:text-primary transition-colors" href="/contact">Contact</a>
+      <a href="{% url 'about' %}" class="nav-link text-gray-700 hover:text-primary transition-colors" >About</a>
+      <a href="{% url 'contact' %}" class="nav-link text-gray-700 hover:text-primary transition-colors" href="/contact">Contact</a>
       <button class="bg-accent text-white px-6 py-2 !rounded-button shadow hover:bg-accent/90 transition-all whitespace-nowrap">
         Get Started
       </button>
@@ -112,6 +112,7 @@ body {
   </nav>
 </header>
 <main class="mt-20">
+  {% load static %}
 <section class="hero-section min-h-[600px] flex items-center bg-darkEmerald text-white">
   <div class="container mx-auto px-6 py-20 flex flex-col md:flex-row items-center gap-10">
     <!-- Text Content -->
@@ -135,9 +136,10 @@ body {
       </div>
     </div>
     <!-- Image Content -->
+     
     <div class="md:w-1/2 h-[600px] md:h-auto">
       <img
-        src="911f064f7b4ee120be4303521325a90d.jpg"
+        src="{% static '\hello\images\911f064f7b4ee120be4303521325a90d.jpg' %}" alt="Yoga Image 1"
         alt="Yoga Meditation"
         class="w-full h-full rounded-lg shadow-2xl object-cover"
       />
