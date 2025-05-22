@@ -102,7 +102,8 @@ body {
       <a href="/services" class="nav-link text-gray-700 hover:text-primary transition-colors" href="/services">Attendance</a>
       <a href="{% url 'about' %}" class="nav-link text-gray-700 hover:text-primary transition-colors" >About</a>
       <a href="{% url 'contact' %}" class="nav-link text-gray-700 hover:text-primary transition-colors" href="/contact">Contact</a>
-      <button class="bg-accent text-white px-6 py-2 !rounded-button shadow hover:bg-accent/90 transition-all whitespace-nowrap">
+      <button onclick = "window.location.href = {%url 'video' %}"
+       class="bg-accent text-white px-6 py-2 !rounded-button shadow hover:bg-accent/90 transition-all whitespace-nowrap">
         Get Started
       </button>
     </div>

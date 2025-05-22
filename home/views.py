@@ -23,4 +23,10 @@ def contact(request):
    return render(request,"contact.html")
 def services(request):
     return HttpResponse("this is my contact page")
+def video(request):
+        room_name = "MyCustomRoom123"  
+        context = {
+        'room_name': room_name,
+    }
+        return render(request,"meet.html")
 # Create your views here.

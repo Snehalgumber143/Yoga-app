@@ -1,0 +1,92 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Live Yoga Session - ZenFlow</title>
+
+  <!-- Jitsi and Tailwind -->
+  <script src='https://meet.jit.si/external_api.js'></script>
+  <script src="https://cdn.tailwindcss.com/3.4.16"></script>
+
+  <!-- Tailwind config -->
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: '#2E8B57',
+            secondary: '#8B5E3C',
+          },
+          borderRadius: {
+            button: '8px',
+          }
+        }
+      }
+    };
+  </script>
+
+  <!-- Fonts and Icons -->
+  <link href="https://fonts.googleapis.com/css2?family=Pacifico&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.6.0/remixicon.min.css">
+
+  <style>
+    body {
+      font-family: 'Poppins', sans-serif;
+      background-color: #F8F8F8;
+      color: #333;
+    }
+    .nav-link {
+      position: relative;
+    }
+    .nav-link::after {
+      content: '';
+      position: absolute;
+      width: 0;
+      height: 2px;
+      bottom: -2px;
+      left: 0;
+      background-color: #2E8B57;
+      transition: width 0.3s ease;
+    }
+    .nav-link:hover::after {
+      width: 100%;
+    }
+  </style>
+</head>
+
+<body>
+  <!-- Header -->
+  <header class="bg-white shadow-sm fixed w-full top-0 z-50">
+    <nav class="container mx-auto px-6 py-4 flex items-center justify-between">
+      <h1 class="font-['Pacifico'] text-3xl text-primary">ZenGlow</h1>
+      <div class="hidden md:flex items-center space-x-8">
+        <a href="{% url 'home' %}" class="nav-link text-gray-700 hover:text-primary transition-colors">Home</a>
+        <a href="#" class="nav-link text-gray-700 hover:text-primary transition-colors">Attendance</a>
+        <a href="{% url 'about' %}" class="nav-link text-gray-700 hover:text-primary transition-colors">About</a>
+        <a href="#" class="nav-link text-gray-700 hover:text-primary transition-colors">Contact</a>
+      </div>
+    </nav>
+  </header>
+
+  <!-- Jitsi Meeting Container -->
+  <main class="pt-24">
+    <div id="jitsi-container" class="w-full h-screen"></div>
+  </main>
+
+  <!-- Jitsi Embed -->
+  <script>
+    const domain = "meet.jit.si";
+    const options = {
+      roomName: "{{ room_name }}",
+      width: "100%",
+      height: "100%",
+      parentNode: document.querySelector('#jitsi-container'),
+      interfaceConfigOverwrite: {},
+      configOverwrite: {}
+    };
+    const api = new JitsiMeetExternalAPI(domain, options);
+  </script>
+</body>
+</html>
