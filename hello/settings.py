@@ -71,6 +71,7 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'hello.wsgi.application'
 
+DATABASE_ROUTERS = ['home.routers.MySQLRouter']
 
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
@@ -79,6 +80,14 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': BASE_DIR / 'db.sqlite3',
+    },
+    'mysql_db': {
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'attendance',  
+        'USER': 'attendance',
+        'PASSWORD': 'attendance_password',  # replace with your MySQL password
+        'HOST': 'localhost',
+        'PORT': '3306',
     }
 }
 
