@@ -1,0 +1,143 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Login - ZenFlow Yoga Studio</title>
+
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Segoe UI', sans-serif;
+    }
+
+    body {
+      background: linear-gradient(135deg, #f0f4ff, #ffffff);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .login-card {
+      width: 100%;
+      max-width: 500px;
+      background: #fff;
+      border-radius: 20px;
+      overflow: hidden;
+      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+      animation: fadeIn 0.5s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .login-image {
+      width: 100%;
+      height: 220px;
+      object-fit: cover;
+    }
+
+    .login-body {
+      padding: 2rem;
+    }
+
+    .login-body h2 {
+      text-align: center;
+      margin-bottom: 1rem;
+      font-weight: 700;
+      color: #374151;
+    }
+
+    .login-body p {
+      text-align: center;
+      color: #6b7280;
+      margin-bottom: 2rem;
+    }
+
+    .form-label {
+      font-weight: 600;
+      color: #374151;
+    }
+
+    .form-control {
+      padding: 0.75rem;
+      border-radius: 10px;
+      border: 1px solid #d1d5db;
+    }
+
+    .btn-login {
+      background-color: #6366f1;
+      color: white;
+      padding: 0.75rem;
+      width: 100%;
+      border: none;
+      border-radius: 10px;
+      font-size: 1rem;
+      font-weight: 600;
+      transition: background-color 0.3s ease;
+    }
+
+    .btn-login:hover {
+      background-color: #4f46e5;
+    }
+
+    .alert-container {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      z-index: 1050;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="login-card">
+    <img src="{% static 'hello/images/jared-rice-xce530fBHrk-unsplash.jpg' %}" alt="Yoga studio" class="login-image" />
+    
+    <div class="login-body">
+      <h2>Welcome Back</h2>
+      <p>Log in to continue your journey with ZenFlow Yoga Studio</p>
+
+      <form method="post" action="/login/">
+        {% csrf_token %}
+        
+        <div class="mb-3">
+          <label for="name" class="form-label">Name</label>
+          <input type="text" name="name" id="name" class="form-control" placeholder="Your name" required />
+        </div>
+
+      
+        <div class="mb-4">
+          <label for="password" class="form-label">Password</label>
+          <input type="password" name="password" id="password" class="form-control" placeholder="Your password" required />
+        </div>
+
+        <button type="submit" class="btn btn-login">Login</button>
+      </form>
+    </div>
+  </div>
+
+  {% if messages %}
+    <div class="alert-container">
+      {% for message in messages %}
+        <div class="alert alert-{{ message.tags }} alert-dismissible fade show shadow" role="alert">
+          {{ message }}
+          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+      {% endfor %}
+    </div>
+  {% endif %}
+
+  <!-- Bootstrap JS Bundle -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

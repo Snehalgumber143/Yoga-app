@@ -6,9 +6,10 @@ def index(request):
     context = {
         "variable":"Snehal"
     }
-    messages.success(request, "Your feedback is stored with us it,in case of any query we'll get back to you shortly😊")
+
     return render(request,"index.html",context)
-    #return HttpResponse("this is my homepage")
+def logins(request):
+     return render(request,"logins.html")
 def about(request):
     return render(request,"about.html")
 def contact(request):
@@ -24,9 +25,9 @@ def contact(request):
 def services(request):
     return HttpResponse("this is my contact page")
 def video(request):
-        room_name = "MyCustomRoom123"  
+        room_name = 'ZenFlowYogaRoom123' 
         context = {
         'room_name': room_name,
     }
-        return render(request,"meet.html")
+        return render(request,"meet.html",context)
 # Create your views here.
