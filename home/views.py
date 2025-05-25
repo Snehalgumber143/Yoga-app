@@ -10,6 +10,8 @@ def index(request):
     return render(request,"index.html",context)
 def logins(request):
      return render(request,"logins.html")
+def signup(request):
+     return render(request,"signup.html")
 def about(request):
     return render(request,"about.html")
 def contact(request):
