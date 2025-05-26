@@ -13,15 +13,15 @@ from django.db import models
 class Student(models.Model):
     name = models.CharField(max_length=100)
     email = models.EmailField(unique=True)
-    password = models.CharField(max_length=100)
-    height = models.IntegerField()
-    weight = models.IntegerField()
+    height = models.FloatField()
+    weight = models.FloatField()
     age = models.IntegerField()
     gender = models.CharField(max_length=10)
+    password = models.CharField(max_length=128)  # hashed password
+    created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return f"{self.name} ({self.email})"
-
+        return self.name
 class Admin(models.Model):
     username = models.CharField(max_length=50, unique=True)
     email = models.EmailField()

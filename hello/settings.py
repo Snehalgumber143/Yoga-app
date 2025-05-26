@@ -83,15 +83,15 @@ DATABASES = {
     },
     'mysql_db': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'attendance',  
-        'USER': 'attendance',
-        'PASSWORD': 'attendance_password',  # replace with your MySQL password
+        'NAME': 'yoga',  
+        'USER': 'root',
+        'PASSWORD': 'root',  # replace with your MySQL password
         'HOST': 'localhost',
         'PORT': '3306',
     }
 }
 
-DATABASE_ROUTERS = ['home.dbrouters.MySQLRouter']
+DATABASE_ROUTERS = ['hello.dbrouters.MySQLRouter']
 # Password validation
 # https://docs.djangoproject.com/en/5.2/ref/settings/#auth-password-validators
 
