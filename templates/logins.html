@@ -111,8 +111,8 @@
         {% csrf_token %}
         
         <div class="mb-3">
-          <label for="name" class="form-label">Name</label>
-          <input type="text" name="name" id="name" class="form-control" placeholder="Your name" required />
+          <label for="email" class="form-label">Name</label>
+          <input type="email" name="email" id="email" class="form-control" placeholder="Your email" required />
         </div>
 
       
@@ -122,6 +122,9 @@
         </div>
 
         <button type="submit" class="btn btn-login">Login</button>
+          <p class="signup-text">
+    Don't have an account? <a href="{% url 'signup' %}">Sign up here</a>
+  </p>
       </form>
     </div>
   </div>

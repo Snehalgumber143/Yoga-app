@@ -8,19 +8,26 @@ class Contact(models.Model):
 
     def __str__(self):
         return self.name
+from django.db import models
+
 class Student(models.Model):
     name = models.CharField(max_length=100)
-    roll_number = models.CharField(max_length=50, unique=True)
-    email = models.EmailField()
+    email = models.EmailField(unique=True)
+    password = models.CharField(max_length=100)
+    height = models.IntegerField()
+    weight = models.IntegerField()
+    age = models.IntegerField()
+    gender = models.CharField(max_length=10)
 
     def __str__(self):
-        return self.name
+        return f"{self.name} ({self.email})"
 
 class Admin(models.Model):
     username = models.CharField(max_length=50, unique=True)
     email = models.EmailField()
     is_superuser = models.BooleanField(default=False)
+    students = models.ManyToManyField(Student, related_name='admins', blank=True)
 
     def __str__(self):
         return self.username
-# Create your models here.
+
