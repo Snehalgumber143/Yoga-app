@@ -44,11 +44,12 @@ def signup(request):
             return redirect('signup')
 
         try:
+            hashed_password = make_password(password)
             # Save the student to MySQL database
             Student.objects.using('mysql_db').create(
                 name=name,
                 email=email,
-                password=password,
+                password=hashed_password,
                 gender=gender,
                 age=age,
                 height=height,
@@ -69,6 +70,7 @@ def logins(request):
         password = request.POST['password']
 
         try:
+            
             student = Student.objects.using('mysql_db').get(email__iexact=email)
             if check_password(password, student.password):
                 request.session['student_name'] = student.name
