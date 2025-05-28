@@ -6,6 +6,7 @@ from django.contrib.auth.hashers import make_password
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.hashers import check_password
 from django.contrib import messages
+from django.contrib.auth.decorators import login_required, user_passes_test
 def index(request):
     student_name = request.session.get('student_name', 'Guest')
 
@@ -106,9 +107,9 @@ def video(request):
         'room_name': room_name,
     }
         return render(request,"meet.html",context)
+@login_required
+@user_passes_test(lambda u: u.is_staff)
 def admin_portal(request):
-    students = Student.objects.all()
     students = Student.objects.all().order_by('-created_at')
     return render(request, 'admin_portal.html', {'students': students})
-
 # Create your views here.
