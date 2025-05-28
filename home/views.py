@@ -57,7 +57,7 @@ def signup(request):
             )
             print(f"Saving: {name}, {email}, {password}, {gender}, {age}, {height}, {weight}")
             messages.success(request, "Signup successful!")
-            return redirect('login')
+            return redirect('logins')
         except Exception as e:
             messages.error(request, f"Error saving data: {str(e)}")
             return redirect('signup')
@@ -75,7 +75,7 @@ def logins(request):
             if check_password(password, student.password):
                 request.session['student_name'] = student.name
                 request.session['student_id'] = student.id
-                return redirect('index')
+                return redirect('home')
             else:
                 messages.error(request, "Invalid password.")
         except Student.DoesNotExist:

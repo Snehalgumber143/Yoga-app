@@ -106,7 +106,7 @@
       <h2>Welcome</h2>
       <p>Signup to continue your journey with ZenFlow Yoga Studio</p>
 
-      <form method="post" action="/login/">
+     <form method="post" action="{% url 'signup' %}">
         {% csrf_token %}
         
         <div class="mb-3">
