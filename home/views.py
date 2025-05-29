@@ -1,4 +1,4 @@
-from django.shortcuts import redirect, render,HttpResponse
+from django.shortcuts import get_object_or_404, redirect, render,HttpResponse
 from datetime import datetime
 from home.models import Student
 from home.models import Contact
@@ -112,4 +112,13 @@ def video(request):
 def admin_portal(request):
     students = Student.objects.all().order_by('-created_at')
     return render(request, 'admin_portal.html', {'students': students})
+def delete_student(request, student_id):
+    if request.method == 'POST':
+        student = get_object_or_404(Student, id=student_id)
+        student.delete()
+        messages.success(request, f"Student '{student.name}' has been deleted.")
+    else:
+        messages.error(request, "Invalid request method.")
+
+    return redirect('admin_portal')
 # Create your views here.

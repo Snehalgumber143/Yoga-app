@@ -2,77 +2,197 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
+    <meta charset="UTF-8" />
     <title>Admin Portal - Student List</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet" />
     <style>
         body {
-            background-color: #f8f9fa;
-            padding: 2rem;
+            background-color: #eef2f7;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            min-height: 100vh;
+            padding: 0;
+            margin: 0;
+        }
+
+        /* Navbar styles */
+        nav.navbar {
+            background: #4f46e5;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        nav.navbar .navbar-brand {
+            color: white;
+            font-weight: 700;
+            font-size: 1.5rem;
+        }
+        nav.navbar .navbar-brand:hover {
+            color: #d1d5db;
+            text-decoration: none;
+        }
+        nav.navbar .logout-btn {
+            border: 2px solid white;
+            color: white;
+            font-weight: 600;
+            padding: 0.4rem 1rem;
+            border-radius: 8px;
+            transition: background-color 0.3s ease, color 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+            font-size: 1rem;
+            background: transparent;
+        }
+        nav.navbar .logout-btn:hover {
+            background-color: white;
+            color: #4f46e5;
+            text-decoration: none;
         }
 
         .container {
-            background: #fff;
-            padding: 2rem;
+            max-width: 1100px;
+            margin: 2rem auto 4rem;
+            background: white;
             border-radius: 12px;
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+            padding: 2rem 3rem;
         }
 
-        h2 {
-            margin-bottom: 1.5rem;
-            color: #343a40;
+        table {
+            border-collapse: separate;
+            border-spacing: 0 0.75rem;
+            width: 100%;
+            font-size: 0.95rem;
         }
 
-        .table th {
-            background-color: #f1f1f1;
+        thead th {
+            background-color: #e0e7ff;
+            color: #3730a3;
+            font-weight: 700;
+            padding: 0.75rem 1rem;
+            text-align: left;
+            border-radius: 8px;
         }
 
-        .logout-btn {
-            float: right;
+        tbody tr {
+            background: #fafafa;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            transition: transform 0.15s ease;
+            border-radius: 8px;
+        }
+
+        tbody tr:hover {
+            background-color: #f3f4f6;
+            transform: translateY(-2px);
+        }
+
+        tbody td {
+            padding: 0.75rem 1rem;
+            vertical-align: middle;
+            color: #4b5563;
+            border: none;
+        }
+
+        /* Delete button style */
+        .btn-delete {
+            background-color: #dc3545;
+            border: none;
+            color: white;
+            padding: 0.35rem 0.75rem;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        .btn-delete:hover {
+            background-color: #b02a37;
+        }
+
+        .alert-info {
+            max-width: 600px;
+            margin: 3rem auto;
+            text-align: center;
+            font-weight: 600;
+            color: #4b5563;
+            background-color: #e0e7ff;
+            border-radius: 12px;
+            padding: 1rem 2rem;
+            box-shadow: 0 0 10px rgba(79,70,229,0.2);
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 1.5rem 1rem;
+            }
+            thead th, tbody td {
+                padding: 0.5rem 0.75rem;
+                font-size: 0.85rem;
+            }
+            nav.navbar .navbar-brand {
+                font-size: 1.2rem;
+            }
+            nav.navbar .logout-btn {
+                font-size: 0.9rem;
+                padding: 0.3rem 0.7rem;
+            }
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="d-flex justify-content-between align-items-center mb-4">
-            <h2>Registered Students</h2>
-            <a href="{% url 'logout' %}" class="btn btn-outline-danger logout-btn">Logout</a>
-        </div>
 
-        {% if students %}
-        <div class="table-responsive">
-            <table class="table table-bordered table-hover align-middle">
-                <thead class="table-light">
-                    <tr>
-                        <th>#</th>
-                        <th>Name</th>
-                        <th>Email</th>
-                        <th>Height (cm)</th>
-                        <th>Weight (kg)</th>
-                        <th>Age</th>
-                        <th>Gender</th>
-                        <th>Registered At</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for student in students %}
-                    <tr>
-                        <td>{{ forloop.counter }}</td>
-                        <td>{{ student.name }}</td>
-                        <td>{{ student.email }}</td>
-                        <td>{{ student.height }}</td>
-                        <td>{{ student.weight }}</td>
-                        <td>{{ student.age }}</td>
-                        <td>{{ student.gender }}</td>
-                        <td>{{ student.created_at|date:"Y-m-d H:i" }}</td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
-        {% else %}
-            <div class="alert alert-info">No students have registered yet.</div>
-        {% endif %}
+<nav class="navbar px-4 py-3">
+    <a class="navbar-brand" href="{% url 'home' %}">ZenFlow Admin</a>
+    <a href="{% url 'logout' %}" class="logout-btn" title="Logout">
+        <i class="bi bi-box-arrow-right"></i> Logout
+    </a>
+</nav>
+
+<div class="container">
+    {% if students %}
+    <div class="table-responsive">
+        <table>
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Height (cm)</th>
+                    <th>Weight (kg)</th>
+                    <th>Age</th>
+                    <th>Gender</th>
+                    <th>Registered At</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for student in students %}
+                <tr>
+                    <td>{{ forloop.counter }}</td>
+                    <td>{{ student.name }}</td>
+                    <td>{{ student.email }}</td>
+                    <td>{{ student.height }}</td>
+                    <td>{{ student.weight }}</td>
+                    <td>{{ student.age }}</td>
+                    <td>{{ student.gender }}</td>
+                    <td>{{ student.created_at|date:"Y-m-d H:i" }}</td>
+                    <td>
+                        <form method="post" action="{% url 'delete_student' student.id %}" style="display:inline;">
+                            {% csrf_token %}
+                            <button type="submit" class="btn-delete" onclick="return confirm('Are you sure you want to delete this student?');">
+                                <i class="bi bi-trash-fill"></i> Delete
+                            </button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
     </div>
+    {% else %}
+        <div class="alert alert-info">No students have registered yet.</div>
+    {% endif %}
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

@@ -102,10 +102,11 @@ body {
       <a href="/services" class="nav-link text-gray-700 hover:text-primary transition-colors" href="/services">Attendance</a>
       <a href="{% url 'about' %}" class="nav-link text-gray-700 hover:text-primary transition-colors" >About</a>
       <a href="{% url 'contact' %}" class="nav-link text-gray-700 hover:text-primary transition-colors" href="/contact">Contact</a>
-      <button onclick = "window.location.href = {%url 'video' %}"
+      <button 
        class="bg-accent text-white px-6 py-2 !rounded-button shadow hover:bg-accent/90 transition-all whitespace-nowrap">
         Get Started
       </button>
+   
     </div>
     <button class="md:hidden w-10 h-10 flex items-center justify-center">
       <i class="ri-menu-line text-2xl"></i>
@@ -128,9 +129,11 @@ body {
     Join our mindful community and transform your life with expert-led yoga classes. Experience the perfect blend of physical practice and spiritual wellness.
   </p>
       <div class="flex gap-4">
+         <a href="{% url 'video' %}">
         <button class="cta-button text-white px-8 py-3 !rounded-button shadow-lg whitespace-nowrap">
-          Start Your Journey
+          Join Session
         </button>
+      </a>
         <button class="bg-white text-primary px-8 py-3 !rounded-button shadow border border-primary hover:bg-gray-50 transition-colors whitespace-nowrap">
           Learn More
         </button>
