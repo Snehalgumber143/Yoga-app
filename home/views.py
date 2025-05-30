@@ -76,6 +76,7 @@ def logins(request):
             if check_password(password, student.password):
                 request.session['student_name'] = student.name
                 request.session['student_id'] = student.id
+                request.session['student_email'] = student.email
                 return redirect('home')
             else:
                 messages.error(request, "Invalid password.")
@@ -100,7 +101,14 @@ def contact(request):
       
    return render(request,"contact.html")
 def services(request):
-    return HttpResponse("this is my contact page")
+    student_name = request.session.get('student_name', 'Guest')
+    student_email = request.session.get('student_email', 'Guest')  
+    context = {
+        "student_name": student_name,
+        "student_email": student_email
+    }
+
+    return render(request,"attendance.html",context)
 def video(request):
         room_name = 'ZenFlowYogaRoom123' 
         context = {
