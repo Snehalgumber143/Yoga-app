@@ -679,34 +679,34 @@
             }
 
             // In Django, this would be a POST request
-            fetch('{% url "save_attendance" %}', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
-                },
-                body: JSON.stringify({
-                    attendance_data: attendanceData,
-                    date: document.getElementById('attendanceDate').value,
-                    class_type: document.getElementById('classType').value,
-                    instructor: document.getElementById('instructor').value
-                })
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    alert('Attendance saved successfully!');
-                    location.reload();
-                } else {
-                    alert('Error saving attendance: ' + data.error);
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                alert('Error saving attendance');
-            });
+<script>
+    fetch('{% url "save_attendance" %}', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+        },
+        body: JSON.stringify({
+            attendance_data: attendanceData,
+            date: document.getElementById('attendanceDate').value,
+            class_type: document.getElementById('classType').value,
+            instructor: document.getElementById('instructor').value
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert('Attendance saved successfully!');
+            location.reload();
+        } else {
+            alert('Error saving attendance: ' + data.error);
         }
-
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Error saving attendance');
+    });
+</script>
         // Edit attendance
         function editAttendance(recordId) {
             // Load record data and show modal

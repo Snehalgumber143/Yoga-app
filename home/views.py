@@ -1,6 +1,7 @@
 from django.shortcuts import get_object_or_404, redirect, render,HttpResponse
 from datetime import datetime
-from home.models import Student
+from home.models import Student,Attendance
+from django.views.decorators.http import require_POST
 from home.models import Contact
 from django.contrib.auth.hashers import make_password
 from django.contrib.auth import authenticate, login
@@ -102,13 +103,20 @@ def contact(request):
    return render(request,"contact.html")
 def services(request):
     student_name = request.session.get('student_name', 'Guest')
-    student_email = request.session.get('student_email', 'Guest')  
+    student_email = request.session.get('student_email', 'guest@example.com')
+    student_id = request.session.get('student_id')
+
+    attendance_records = []
+    if student_id:
+        attendance_records = Attendance.objects.filter(student_id=student_id).order_by('-date')
+
     context = {
         "student_name": student_name,
-        "student_email": student_email
+        "student_email": student_email,
+        "attendance_records": attendance_records
     }
 
-    return render(request,"attendance.html",context)
+    return render(request, "attendance.html", context)
 def video(request):
         room_name = 'ZenFlowYogaRoom123' 
         context = {
@@ -127,6 +135,19 @@ def delete_student(request, student_id):
         messages.success(request, f"Student '{student.name}' has been deleted.")
     else:
         messages.error(request, "Invalid request method.")
+
+    return redirect('admin_portal')
+@require_POST
+def save_attendance(request):
+    student_id = request.POST.get('student_id')
+    status = request.POST.get('status')
+
+    try:
+        student = Student.objects.get(id=student_id)
+        Attendance.objects.create(student=student, status=status)
+        messages.success(request, f"Attendance saved for {student.name}.")
+    except Student.DoesNotExist:
+        messages.error(request, "Student not found.")
 
     return redirect('admin_portal')
 # Create your views here.
