@@ -1,3 +1,6 @@
+import json
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
 from django.shortcuts import get_object_or_404, redirect, render,HttpResponse
 from datetime import datetime
 from home.models import Student,Attendance
@@ -137,17 +140,49 @@ def delete_student(request, student_id):
         messages.error(request, "Invalid request method.")
 
     return redirect('admin_portal')
+@csrf_exempt 
 @require_POST
 def save_attendance(request):
-    student_id = request.POST.get('student_id')
-    status = request.POST.get('status')
+    if request.method != 'POST':
+        return JsonResponse({'success': False, 'error': 'Only POST method allowed.'})
 
     try:
-        student = Student.objects.get(id=student_id)
-        Attendance.objects.create(student=student, status=status)
-        messages.success(request, f"Attendance saved for {student.name}.")
-    except Student.DoesNotExist:
-        messages.error(request, "Student not found.")
+        data = json.loads(request.body)
 
-    return redirect('admin_portal')
-# Create your views here.
+        attendance_data = data.get('attendance_data', [])
+        date = data.get('date')
+        class_type = data.get('class_type')
+        instructor = data.get('instructor')
+
+        if not (date and class_type and instructor):
+            return JsonResponse({'success': False, 'error': 'Missing required fields (date, class_type, instructor).'})
+
+        attendance_objects = []
+        for entry in attendance_data:
+            student_id = entry.get('student_id')
+            status = entry.get('status')
+            if student_id is None or status is None:
+                continue  # skip incomplete entries
+            try:
+                student = Student.objects.get(id=student_id)
+            except Student.DoesNotExist:
+                continue  # skip invalid student IDs
+
+            attendance_objects.append(
+                Attendance(
+                    student=student,
+                    status=status,
+                    date=date,
+                    class_type=class_type,
+                    instructor=instructor
+                )
+            )
+
+        Attendance.objects.bulk_create(attendance_objects)
+
+        return JsonResponse({'success': True, 'saved_records': len(attendance_objects)})
+
+    except json.JSONDecodeError:
+        return JsonResponse({'success': False, 'error': 'Invalid JSON.'})
+    except Exception as e:
+        return JsonResponse({'success': False, 'error': str(e)})
