@@ -111,7 +111,8 @@ def services(request):
 
     attendance_records = []
     if student_id:
-        attendance_records = Attendance.objects.filter(student_id=student_id).order_by('-date')
+        attendance_records = Attendance.objects.using('mysql_db').filter(student_id=student_id).order_by('-date')
+
 
     context = {
         "student_name": student_name,
@@ -186,3 +187,15 @@ def save_attendance(request):
         return JsonResponse({'success': False, 'error': 'Invalid JSON.'})
     except Exception as e:
         return JsonResponse({'success': False, 'error': str(e)})
+def export_attendance(request):
+    return HttpResponse("Export not implemented yet.")
+@csrf_exempt
+def delete_attendance(request, id):
+    if request.method == 'DELETE':
+        try:
+            attendance_record = Attendance.objects.get(id=id)
+            attendance_record.delete()
+            return JsonResponse({'success': True})
+        except Attendance.DoesNotExist:
+            return JsonResponse({'success': False, 'error': 'Record not found'})
+    return JsonResponse({'success': False, 'error': 'Invalid request method'})
