@@ -193,8 +193,8 @@ def export_attendance(request):
 def delete_attendance(request, id):
     if request.method == 'DELETE':
         try:
-            attendance_record = Attendance.objects.get(id=id)
-            attendance_record.delete()
+            attendance = Attendance.objects.get(id=id)
+            attendance.delete()
             return JsonResponse({'success': True})
         except Attendance.DoesNotExist:
             return JsonResponse({'success': False, 'error': 'Record not found'})
