@@ -585,30 +585,25 @@
         }
 
         // Load students for attendance marking
-        function loadStudentsForAttendance() {
-            const date = document.getElementById('attendanceDate').value;
-            const classType = document.getElementById('classType').value;
-            
-            if (!date || !classType) {
-                alert('Please select date and class type');
-                return;
-            }
+       function loadStudentsForAttendance() {
+    const date = document.getElementById('attendanceDate').value;
+    const classType = document.getElementById('classType').value;
 
-            // Show the students container
-            document.getElementById('studentsAttendanceContainer').style.display = 'block';
-            
-            // Load students (in Django, this would be an AJAX call)
-            const tbody = document.getElementById('studentsAttendanceBody');
-            tbody.innerHTML = '';
-            
-            // Sample students data - replace with actual Django data
-            const students = [
-                {id: 1, name: 'John Doe', email: 'john@email.com'},
-                {id: 2, name: 'Jane Smith', email: 'jane@email.com'},
-                {id: 3, name: 'Mike Johnson', email: 'mike@email.com'},
-                {id: 4, name: 'Sarah Wilson', email: 'sarah@email.com'}
-            ];
-            
+    if (!date || !classType) {
+        alert('Please select date and class type');
+        return;
+    }
+
+    // Show the students container
+    document.getElementById('studentsAttendanceContainer').style.display = 'block';
+
+    const tbody = document.getElementById('studentsAttendanceBody');
+    tbody.innerHTML = '';
+
+    // Fetch students from the backend
+    fetch('/get-students/')
+        .then(response => response.json())
+        .then(students => {
             students.forEach(student => {
                 const row = `
                     <tr>
@@ -629,7 +624,12 @@
                 `;
                 tbody.innerHTML += row;
             });
-        }
+        })
+        .catch(error => {
+            console.error('Error loading students:', error);
+            alert('Failed to load students.');
+        });
+}
 
         // Mark individual student
         function markStudent(studentId, status) {
