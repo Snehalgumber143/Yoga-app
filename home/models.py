@@ -33,7 +33,11 @@ class Admin(models.Model):
 
 class Attendance(models.Model):
     student = models.ForeignKey(Student, on_delete=models.CASCADE)
-    status = models.CharField(max_length=10)
     date = models.DateField()
+    is_present = models.BooleanField(default=False)
     class_type = models.CharField(max_length=50, default='yoga')
     instructor = models.CharField(max_length=50)
+
+    
+    def __str__(self):
+        return f"{self.student.name} - {self.date} - {'Present' if self.is_present else 'Absent'}"

@@ -1,4 +1,6 @@
 import json
+from datetime import date
+from django.core.mail import send_mail
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.shortcuts import get_object_or_404, redirect, render,HttpResponse
@@ -131,8 +133,29 @@ def video(request):
 @login_required
 @user_passes_test(lambda u: u.is_staff)
 def admin_portal(request):
-    students = Student.objects.all().order_by('-created_at')
-    return render(request, 'admin_portal.html', {'students': students})
+    students = Student.objects.all()
+
+    # Optional: get selected student id from query param
+    student_id = request.GET.get('student_id')
+    selected_student = None
+    attendance_map = {}
+
+    if student_id:
+        try:
+            selected_student = Student.objects.get(id=student_id)
+            attendance_records = Attendance.objects.filter(student=selected_student).order_by('date')
+            attendance_map = {record.date.strftime('%Y-%m-%d'): record.status for record in attendance_records}
+        except Student.DoesNotExist:
+            selected_student = None
+            attendance_map = {}
+
+    context = {
+        'students': students,
+        'student': selected_student,
+        'attendance_map': attendance_map,
+    }
+    return render(request, 'admin_portal.html', context)
+
 def delete_student(request, student_id):
     if request.method == 'POST':
         student = get_object_or_404(Student, id=student_id)
@@ -145,51 +168,44 @@ def delete_student(request, student_id):
 @csrf_exempt
 @require_POST
 def save_attendance(request):
-    try:
+    if request.method == 'POST':
         data = json.loads(request.body)
+        attendance_list = data.get('attendance_data', [])
 
-        attendance_data = data.get('attendance_data', [])
-        date = data.get('date')
-        class_type = data.get('class_type')
-        instructor = data.get('instructor')
+        saved_records = []
 
-        if not (date and class_type and instructor):
-            return JsonResponse({'success': False, 'error': 'Missing required fields (date, class_type, instructor).'})
+        for record in attendance_list:
+            student_id = record['student_id']
+            is_present = record['is_present']
+            class_type = record['class_type']
+            date = record['date']
+            instructor = record['instructor']
 
-        attendance_objects = []
+            student = Student.objects.get(id=student_id)
 
-        for entry in attendance_data:
-            student_id = entry.get('student_id')
-            status = entry.get('status')
-
-            if student_id is None or status is None:
-                continue  # Skip invalid entries
-
-            try:
-                student = Student.objects.using('mysql_db').get(id=student_id)
-            except Student.DoesNotExist:
-                continue  # Skip invalid students
-
-            attendance_objects.append(
-                Attendance(
-                    student=student,
-                    status=status,
-                    date=date,
-                    class_type=class_type,
-                    instructor=instructor
-                )
+            Attendance.objects.update_or_create(
+                student=student,
+                date=date,
+                defaults={
+                    'is_present': is_present,
+                    'class_type': class_type,
+                    'instructor': instructor
+                }
             )
 
-        # Save all attendance records using the MySQL DB
-        with transaction.atomic(using='mysql_db'):
-            Attendance.objects.using('mysql_db').bulk_create(attendance_objects)
+            saved_records.append({
+                'student_id': student.id,
+                'name': student.name,
+                'email': student.email,
+                'height': student.height,
+                'weight': student.weight,
+                'date': date,
+                'is_present': is_present,
+                'class_type': class_type,
+                'instructor': instructor,
+            })
 
-        return JsonResponse({'success': True, 'saved_records': len(attendance_objects)})
-
-    except json.JSONDecodeError:
-        return JsonResponse({'success': False, 'error': 'Invalid JSON.'})
-    except Exception as e:
-        return JsonResponse({'success': False, 'error': str(e)})
+        return JsonResponse({'success': True, 'saved_attendance': saved_records})
 @csrf_exempt
 def delete_attendance(request, id):
     if request.method == 'DELETE':
@@ -205,3 +221,15 @@ def get_students(request):
     return JsonResponse(list(students), safe=False)
 def export_attendance(request):
     return HttpResponse("Export not implemented yet.")
+def get_logged_in_students(request):
+    students = Student.objects.all()
+    data = [
+        {
+            'name': student.name,
+            'email': student.email,
+            'height': student.height,
+            'weight': student.weight
+        }
+        for student in students
+    ]
+    return JsonResponse(data, safe=False)

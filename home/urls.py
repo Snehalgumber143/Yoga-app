@@ -16,5 +16,6 @@ urlpatterns = [
     path('delete-attendance/<int:id>/', views.delete_attendance, name='delete_attendance'),
     path('get-students/', views.get_students, name='get_students'),
     path('signup/', views.signup, name='signup'),
+    path('get-logged-in-students/', views.get_logged_in_students, name='get_logged_in_students'),
     path('export-attendance/', views.export_attendance, name='export_attendance')
 ]
