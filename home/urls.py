@@ -14,6 +14,7 @@ urlpatterns = [
     path('login/', views.logins, name='logins'),
     path('logout/', auth_views.LogoutView.as_view(next_page='/'), name='logout'),
     path('delete-attendance/<int:id>/', views.delete_attendance, name='delete_attendance'),
+    path('get-students/', views.get_students, name='get_students'),
     path('signup/', views.signup, name='signup'),
     path('export-attendance/', views.export_attendance, name='export_attendance')
 ]

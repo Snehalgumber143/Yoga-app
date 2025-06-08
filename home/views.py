@@ -10,6 +10,7 @@ from django.contrib.auth.hashers import make_password
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.hashers import check_password
 from django.contrib import messages
+from django.db import transaction
 from django.contrib.auth.decorators import login_required, user_passes_test
 def index(request):
     student_name = request.session.get('student_name', 'Guest')
@@ -141,12 +142,9 @@ def delete_student(request, student_id):
         messages.error(request, "Invalid request method.")
 
     return redirect('admin_portal')
-@csrf_exempt 
+@csrf_exempt
 @require_POST
 def save_attendance(request):
-    if request.method != 'POST':
-        return JsonResponse({'success': False, 'error': 'Only POST method allowed.'})
-
     try:
         data = json.loads(request.body)
 
@@ -159,15 +157,18 @@ def save_attendance(request):
             return JsonResponse({'success': False, 'error': 'Missing required fields (date, class_type, instructor).'})
 
         attendance_objects = []
+
         for entry in attendance_data:
             student_id = entry.get('student_id')
             status = entry.get('status')
+
             if student_id is None or status is None:
-                continue  # skip incomplete entries
+                continue  # Skip invalid entries
+
             try:
-                student = Student.objects.get(id=student_id)
+                student = Student.objects.using('mysql_db').get(id=student_id)
             except Student.DoesNotExist:
-                continue  # skip invalid student IDs
+                continue  # Skip invalid students
 
             attendance_objects.append(
                 Attendance(
@@ -179,7 +180,9 @@ def save_attendance(request):
                 )
             )
 
-        Attendance.objects.bulk_create(attendance_objects)
+        # Save all attendance records using the MySQL DB
+        with transaction.atomic(using='mysql_db'):
+            Attendance.objects.using('mysql_db').bulk_create(attendance_objects)
 
         return JsonResponse({'success': True, 'saved_records': len(attendance_objects)})
 
@@ -187,8 +190,6 @@ def save_attendance(request):
         return JsonResponse({'success': False, 'error': 'Invalid JSON.'})
     except Exception as e:
         return JsonResponse({'success': False, 'error': str(e)})
-def export_attendance(request):
-    return HttpResponse("Export not implemented yet.")
 @csrf_exempt
 def delete_attendance(request, id):
     if request.method == 'DELETE':
@@ -199,3 +200,8 @@ def delete_attendance(request, id):
         except Attendance.DoesNotExist:
             return JsonResponse({'success': False, 'error': 'Record not found'})
     return JsonResponse({'success': False, 'error': 'Invalid request method'})
+def get_students(request):
+    students = Student.objects.using('mysql_db').values('id', 'name', 'email')
+    return JsonResponse(list(students), safe=False)
+def export_attendance(request):
+    return HttpResponse("Export not implemented yet.")
