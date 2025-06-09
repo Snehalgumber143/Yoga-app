@@ -2,13 +2,175 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
+  <title>Zenglow - Admin Portal</title>
+  <style>
+    /* Navbar */
+    nav {
+      background-color: #222;
+      color: #eee;
+      padding: 15px 20px;
+      font-size: 20px;
+      font-weight: bold;
+      font-family: Arial, sans-serif;
+    }
+
+    /* Layout */
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background: #f9f9f9;
+    }
+    .container {
+      display: flex;
+      padding: 20px;
+    }
+
+    /* Student List */
+    .student-list {
+      max-width: 300px;
+      margin-right: 40px;
+      background: white;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      height: calc(100vh - 80px);
+      overflow-y: auto;
+    }
+    .student-list h3 {
+      margin: 0;
+      padding: 10px;
+      border-bottom: 1px solid #ccc;
+      background: #f0f0f0;
+    }
+    .student-list ul {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+    }
+    .student-list li {
+      padding: 10px;
+      cursor: pointer;
+      border-bottom: 1px solid #eee;
+      transition: background-color 0.2s ease;
+    }
+    .student-list li:hover {
+      background-color: #ddd;
+    }
+    .student-list li.active {
+      background-color: #a6f3a6;
+      font-weight: bold;
+    }
+
+    /* Details */
+    .student-details {
+      flex-grow: 1;
+      background: white;
+      padding: 20px;
+      border-radius: 4px;
+      box-shadow: 0 0 6px #ccc;
+      max-height: calc(100vh - 80px);
+      overflow-y: auto;
+    }
+    .student-info p {
+      margin: 6px 0;
+    }
+
+    /* Calendar */
+    table.calendar {
+      border-collapse: collapse;
+      margin-top: 20px;
+      width: 100%;
+      max-width: 480px;
+    }
+    table.calendar th, table.calendar td {
+      border: 1px solid #ccc;
+      padding: 8px 0;
+      text-align: center;
+      vertical-align: middle;
+      width: 14.28%; /* 100/7 */
+      cursor: pointer;
+      user-select: none;
+    }
+    table.calendar th {
+      background: #f0f0f0;
+    }
+    table.calendar td.present {
+      background-color: #a6f3a6;
+    }
+    table.calendar td.absent {
+      background-color: #f3a6a6;
+    }
+    table.calendar td.no-record {
+      background-color: #eee;
+      cursor: default;
+    }
+
+    #saveAttendanceBtn {
+      margin-top: 15px;
+      padding: 10px 20px;
+      font-size: 16px;
+      cursor: pointer;
+      background-color: #222;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      transition: background-color 0.3s ease;
+    }
+    #saveAttendanceBtn:hover {
+      background-color: #444;
+    }
+  </style>
+</head>
+<body>
+  <nav>Zenglow</nav>
+
+  <div class="container">
+    <div class="student-list">
+      <h3>Students</h3>
+      <ul>
+        {% for stu in students %}
+          <li
+            onclick="window.location='?student_id={{ stu.id }}'"
+            class="{% if student and stu.id == student.id %}active{% endif %}">
+            {{ stu.name }}
+          </li>
+        {% endfor %}
+      </ul>
+    </div>
+
+    <div class="student-details">
+      {% if student %}
+        <h3>Student Details</h3>
+        <div class="student-info">
+          <p><strong>Name:</strong> {{ student.name }}</p>
+          <p><strong>Email:</strong> {{ student.email }}</p>
+          <p><strong>Height:</strong> {{ student.height }} cm</p>
+          <p><strong>Weight:</strong> {{ student.weight }} kg</p>
+          <p><strong>Age:</strong> {{ student.age }}</p>
+          <p><strong>Gender:</strong> {{ student.gender }}</p>
+        </div>
+
+        <h3>Attendance Calendar - {{ student.name }}</h3>
+        <div id="calendar"></div>
+        <button id="saveAttendanceBtn">Save Attendance</button>
+      {% else %}
+        <p>Select a student from the list to see their attendance details.</p>
+      {% endif %}
+    </div>
+  </div>
+
+  <!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
   <title>Admin Portal - Student Attendance</title>
   <style>
-    body { font-family: Arial, sans-serif; padding: 20px; background: #f9f9f9; }
-    h2, h3 { color: #333; }
+    body { font-family: Arial, sans-serif; margin: 0; background: #f9f9f9; }
+    nav { background-color: #444; color: white; padding: 10px 20px; font-size: 18px; }
+    h2, h3 { color: #333; margin-top: 20px; }
     table { border-collapse: collapse; margin-top: 20px; }
-    th, td { border: 1px solid #ccc; padding: 8px 12px; text-align: left; }
-    .calendar td { width: 40px; height: 40px; text-align: center; vertical-align: middle; }
+    th, td { border: 1px solid #ccc; padding: 8px 12px; text-align: center; }
+    .calendar td { width: 40px; height: 40px; vertical-align: middle; cursor: pointer; }
     .present { background-color: #a6f3a6; }
     .absent { background-color: #f3a6a6; }
     .no-record { background-color: #eee; }
@@ -17,11 +179,13 @@
     .student-list ul { list-style: none; padding: 0; }
     .student-list li { padding: 6px; cursor: pointer; border-bottom: 1px solid #ccc; }
     .student-list li:hover { background-color: #ddd; }
+    #saveAttendanceBtn { margin-top: 20px; padding: 10px 20px; font-size: 16px; background-color: #28a745; color: white; border: none; cursor: pointer; }
+    #saveAttendanceBtn:hover { background-color: #218838; }
   </style>
 </head>
 <body>
 
-  <h2>Admin Portal - Students</h2>
+  <nav>Zenglow</nav>
 
   <div class="student-list">
     <h3>Students</h3>
@@ -47,62 +211,113 @@
       </div>
 
       <h3>Attendance Calendar - {{ student.name }}</h3>
-      <div id="calendar"></div>
+      <div id="calendar" data-student-id="{{ student.id }}"></div>
+      <button id="saveAttendanceBtn">Save Attendance</button>
     {% else %}
       <p>Select a student from the list to see their attendance details.</p>
     {% endif %}
   </div>
-
+<div id="calendar" data-student-id="{{ student.id }}"></div>
   <script>
+    {% if student %}
     const attendance = {{ attendance_map|safe }};
     const calendarDiv = document.getElementById('calendar');
+    const studentId = calendarDiv.dataset.studentId;
 
-    if (calendarDiv) {
-      const today = new Date();
-      const year = today.getFullYear();
-      const month = today.getMonth();
-      const daysInMonth = new Date(year, month + 1, 0).getDate();
-      const firstDayWeekday = new Date(year, month, 1).getDay();
+    const today = new Date();
+    const year = today.getFullYear();
+    const month = today.getMonth();
+    const daysInMonth = new Date(year, month + 1, 0).getDate();
+    const firstDayWeekday = new Date(year, month, 1).getDay();
 
-      let html = '<table class="calendar"><tr>';
+    let html = '<table class="calendar"><tr>';
+    const weekdays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+    weekdays.forEach(day => { html += `<th>${day}</th>`; });
+    html += '</tr><tr>';
 
-      // Weekday headers
-      const weekdays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-      weekdays.forEach(day => { html += `<th>${day}</th>`; });
-      html += '</tr><tr>';
-
-      // Empty cells before first day
-      for (let i = 0; i < firstDayWeekday; i++) {
-        html += '<td class="no-record"></td>';
-      }
-
-      // Fill days with attendance status
-      for (let day = 1; day <= daysInMonth; day++) {
-        const dateStr = `${year}-${String(month+1).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
-        const status = attendance[dateStr];
-
-        let className = 'no-record';
-        if (status === 'present' || status === '1') className = 'present';
-        else if (status === 'absent' || status === '0') className = 'absent';
-
-        html += `<td class="${className}">${day}</td>`;
-
-        // New row after Saturday
-        if ((firstDayWeekday + day) % 7 === 0) {
-          html += '</tr><tr>';
-        }
-      }
-
-      // Empty cells after last day
-      const remainingCells = (7 - (firstDayWeekday + daysInMonth) % 7) % 7;
-      for (let i = 0; i < remainingCells; i++) {
-        html += '<td class="no-record"></td>';
-      }
-
-      html += '</tr></table>';
-
-      calendarDiv.innerHTML = html;
+    for (let i = 0; i < firstDayWeekday; i++) {
+      html += '<td class="no-record"></td>';
     }
+
+    for (let day = 1; day <= daysInMonth; day++) {
+      const dateStr = `${year}-${String(month+1).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
+      const status = attendance[dateStr];
+
+      let className = 'no-record';
+      if (status === 'present' || status === '1') className = 'present';
+      else if (status === 'absent' || status === '0') className = 'absent';
+
+      html += `<td data-date="${dateStr}" class="${className}">${day}</td>`;
+
+      if ((firstDayWeekday + day) % 7 === 0) {
+        html += '</tr><tr>';
+      }
+    }
+
+    const remainingCells = (7 - (firstDayWeekday + daysInMonth) % 7) % 7;
+    for (let i = 0; i < remainingCells; i++) {
+      html += '<td class="no-record"></td>';
+    }
+
+    html += '</tr></table>';
+    calendarDiv.innerHTML = html;
+
+    // Toggle attendance
+    const cells = calendarDiv.querySelectorAll('td[data-date]');
+    cells.forEach(cell => {
+      cell.addEventListener('click', () => {
+        if (cell.classList.contains('present')) {
+          cell.classList.remove('present');
+          cell.classList.add('absent');
+        } else if (cell.classList.contains('absent')) {
+          cell.classList.remove('absent');
+        } else {
+          cell.classList.add('present');
+        }
+      });
+    });
+
+    // Save attendance
+    document.getElementById('saveAttendanceBtn').addEventListener('click', () => {
+      const attendanceData = [];
+      cells.forEach(cell => {
+        const date = cell.getAttribute('data-date');
+        let status = null;
+        if (cell.classList.contains('present')) status = 'present';
+        else if (cell.classList.contains('absent')) status = 'absent';
+
+        if (status !== null) {
+          attendanceData.push({
+            student_id: studentId,
+            date: date,
+            class_type: 'Yoga',
+            instructor: 'John',
+            status: status
+          });
+        }
+      });
+
+      fetch('/save-attendance/', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRFToken': '{{ csrf_token }}'
+        },
+        body: JSON.stringify({ attendance_data: attendanceData })
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (data.success) {
+          alert('Attendance saved successfully!');
+          location.reload();
+        } else {
+          alert('Failed to save attendance: ' + (data.error || 'Unknown error'));
+        }
+      })
+      .catch(err => alert('Error saving attendance: ' + err));
+    });
+    {% endif %}
   </script>
+
 </body>
 </html>
