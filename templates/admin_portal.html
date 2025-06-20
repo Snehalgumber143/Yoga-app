@@ -217,7 +217,7 @@
       <p>Select a student from the list to see their attendance details.</p>
     {% endif %}
   </div>
-<div id="calendar" data-student-id="{{ student.id }}"></div>
+
   <script>
     {% if student %}
     const attendance = {{ attendance_map|safe }};
