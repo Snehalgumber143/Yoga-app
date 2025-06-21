@@ -170,10 +170,39 @@
     h2, h3 { color: #333; margin-top: 20px; }
     table { border-collapse: collapse; margin-top: 20px; }
     th, td { border: 1px solid #ccc; padding: 8px 12px; text-align: center; }
-    .calendar td { width: 40px; height: 40px; vertical-align: middle; cursor: pointer; }
-    .present { background-color: #a6f3a6; }
-    .absent { background-color: #f3a6a6; }
-    .no-record { background-color: #eee; }
+    .calendar-header {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.calendar-header button {
+  padding: 5px 10px;
+  font-size: 18px;
+}
+
+    .calendar td {
+  width: 40px;
+  height: 40px;
+  text-align: center;
+  vertical-align: middle;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.calendar td:hover {
+  background-color: #eee;
+}
+
+.present { background-color: #a6f3a6 !important; }
+.absent { background-color: #f3a6a6 !important; }
+.no-record {
+  background-color: #ddd;
+  cursor: not-allowed;
+}
+
     .student-info { margin-bottom: 20px; }
     .student-list { max-width: 300px; float: left; margin-right: 40px; }
     .student-list ul { list-style: none; padding: 0; }
@@ -217,107 +246,117 @@
       <p>Select a student from the list to see their attendance details.</p>
     {% endif %}
   </div>
+<div id="calendar" data-student-id="{{ student.id }}"></div>
 
-  <script>
-    {% if student %}
-    const attendance = {{ attendance_map|safe }};
-    const calendarDiv = document.getElementById('calendar');
-    const studentId = calendarDiv.dataset.studentId;
+<script>
+  {% if student %}
+  const attendance = {{ attendance_map|safe }};
+  const calendarDiv = document.getElementById('calendar');
+  const studentId = calendarDiv.dataset.studentId;
 
-    const today = new Date();
-    const year = today.getFullYear();
-    const month = today.getMonth();
-    const daysInMonth = new Date(year, month + 1, 0).getDate();
-    const firstDayWeekday = new Date(year, month, 1).getDay();
+  const today = new Date();
+  const year = today.getFullYear();
+  const month = today.getMonth();
+  const daysInMonth = new Date(year, month + 1, 0).getDate();
+  const firstDayWeekday = new Date(year, month, 1).getDay();
 
-    let html = '<table class="calendar"><tr>';
-    const weekdays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-    weekdays.forEach(day => { html += `<th>${day}</th>`; });
-    html += '</tr><tr>';
+  let html = '<table class="calendar"><thead><tr>';
+  const weekdays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+  weekdays.forEach(day => html += `<th>${day}</th>`);
+  html += '</tr></thead><tbody><tr>';
 
-    for (let i = 0; i < firstDayWeekday; i++) {
-      html += '<td class="no-record"></td>';
+  let dayCounter = 1;
+  let dayOfWeek = firstDayWeekday;
+
+  // Empty cells before the 1st
+  for (let i = 0; i < firstDayWeekday; i++) {
+    html += '<td class="no-record"></td>';
+  }
+
+  while (dayCounter <= daysInMonth) {
+    const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(dayCounter).padStart(2, '0')}`;
+    const status = attendance[dateStr];
+
+    let className = '';
+    if (status === 'present' || status === '1') className = 'present';
+    else if (status === 'absent' || status === '0') className = 'absent';
+
+    html += `<td class="${className}" data-date="${dateStr}" title="Click to toggle">${dayCounter}</td>`;
+    dayCounter++;
+    dayOfWeek++;
+
+    if (dayOfWeek % 7 === 0 && dayCounter <= daysInMonth) {
+      html += '</tr><tr>';
     }
+  }
 
-    for (let day = 1; day <= daysInMonth; day++) {
-      const dateStr = `${year}-${String(month+1).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
-      const status = attendance[dateStr];
+  // Fill remaining empty cells
+  while (dayOfWeek % 7 !== 0) {
+    html += '<td class="no-record"></td>';
+    dayOfWeek++;
+  }
 
-      let className = 'no-record';
-      if (status === 'present' || status === '1') className = 'present';
-      else if (status === 'absent' || status === '0') className = 'absent';
+  html += '</tr></tbody></table>';
+  calendarDiv.innerHTML = html;
 
-      html += `<td data-date="${dateStr}" class="${className}">${day}</td>`;
-
-      if ((firstDayWeekday + day) % 7 === 0) {
-        html += '</tr><tr>';
+  // Enable click toggling
+  const cells = calendarDiv.querySelectorAll('td[data-date]');
+  cells.forEach(cell => {
+    cell.addEventListener('click', () => {
+      if (cell.classList.contains('present')) {
+        cell.classList.remove('present');
+        cell.classList.add('absent');
+      } else if (cell.classList.contains('absent')) {
+        cell.classList.remove('absent');
+      } else {
+        cell.classList.add('present');
       }
-    }
+    });
+  });
 
-    const remainingCells = (7 - (firstDayWeekday + daysInMonth) % 7) % 7;
-    for (let i = 0; i < remainingCells; i++) {
-      html += '<td class="no-record"></td>';
-    }
+  // Save Attendance Button Logic
+  document.getElementById('saveAttendanceBtn').addEventListener('click', () => {
+    const attendanceData = [];
 
-    html += '</tr></table>';
-    calendarDiv.innerHTML = html;
-
-    // Toggle attendance
-    const cells = calendarDiv.querySelectorAll('td[data-date]');
     cells.forEach(cell => {
-      cell.addEventListener('click', () => {
-        if (cell.classList.contains('present')) {
-          cell.classList.remove('present');
-          cell.classList.add('absent');
-        } else if (cell.classList.contains('absent')) {
-          cell.classList.remove('absent');
-        } else {
-          cell.classList.add('present');
-        }
-      });
+      const date = cell.getAttribute('data-date');
+      let status = null;
+      if (cell.classList.contains('present')) status = 'present';
+      else if (cell.classList.contains('absent')) status = 'absent';
+
+      if (status !== null) {
+        attendanceData.push({
+          student_id: studentId,
+          date: date,
+          class_type: 'Yoga', // Customize this
+          instructor: 'John', // Customize this
+          status: status
+        });
+      }
     });
 
-    // Save attendance
-    document.getElementById('saveAttendanceBtn').addEventListener('click', () => {
-      const attendanceData = [];
-      cells.forEach(cell => {
-        const date = cell.getAttribute('data-date');
-        let status = null;
-        if (cell.classList.contains('present')) status = 'present';
-        else if (cell.classList.contains('absent')) status = 'absent';
+    fetch('/save-attendance/', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRFToken': '{{ csrf_token }}'
+      },
+      body: JSON.stringify({ attendance_data: attendanceData })
+    })
+    .then(res => res.json())
+    .then(data => {
+      if (data.success) {
+        alert('Attendance saved successfully!');
+        location.reload();
+      } else {
+        alert('Failed to save: ' + (data.error || 'Unknown error'));
+      }
+    })
+    .catch(err => alert('Save error: ' + err));
+  });
+  {% endif %}
+</script>
 
-        if (status !== null) {
-          attendanceData.push({
-            student_id: studentId,
-            date: date,
-            class_type: 'Yoga',
-            instructor: 'John',
-            status: status
-          });
-        }
-      });
-
-      fetch('/save-attendance/', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'X-CSRFToken': '{{ csrf_token }}'
-        },
-        body: JSON.stringify({ attendance_data: attendanceData })
-      })
-      .then(res => res.json())
-      .then(data => {
-        if (data.success) {
-          alert('Attendance saved successfully!');
-          location.reload();
-        } else {
-          alert('Failed to save attendance: ' + (data.error || 'Unknown error'));
-        }
-      })
-      .catch(err => alert('Error saving attendance: ' + err));
-    });
-    {% endif %}
-  </script>
 
 </body>
 </html>
