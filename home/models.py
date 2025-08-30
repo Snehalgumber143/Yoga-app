@@ -38,6 +38,9 @@ class Attendance(models.Model):
     class_type = models.CharField(max_length=50, default='yoga')
     instructor = models.CharField(max_length=50)
 
+    class Meta:
+        unique_together = ('student', 'date', 'class_type')
+
     
     def __str__(self):
         return f"{self.student.name} - {self.date} - {'Present' if self.is_present else 'Absent'}"

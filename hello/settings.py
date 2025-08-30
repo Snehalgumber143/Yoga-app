@@ -54,7 +54,8 @@ MIDDLEWARE = [
 ]
 
 ROOT_URLCONF = 'hello.urls'
-
+LOGIN_REDIRECT_URL = '/admin-portal/'
+LOGOUT_REDIRECT_URL = '/'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',

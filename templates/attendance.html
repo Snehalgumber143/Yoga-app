@@ -1,569 +1,242 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Attendance - ZenFlow Yoga Studio</title>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-            min-height: 100vh;
-        }
-
-        /* Navigation */
-        .navbar {
-            background: white;
-            padding: 1rem 2rem;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-            position: sticky;
-            top: 0;
-            z-index: 100;
-        }
-
-        .nav-container {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-
-        .logo {
-            font-size: 1.8rem;
-            font-weight: bold;
-            color: #2d5a27;
-            font-style: italic;
-        }
-
-        .nav-links {
-            display: flex;
-            list-style: none;
-            gap: 2rem;
-            align-items: center;
-        }
-
-        .nav-links a {
-            text-decoration: none;
-            color: #666;
-            font-weight: 500;
-            transition: color 0.3s;
-        }
-
-        .nav-links a:hover,
-        .nav-links a.active {
-            color: #2d5a27;
-        }
-
-        .get-started-btn {
-            background: #6c5ce7;
-            color: white;
-            padding: 0.7rem 1.5rem;
-            border-radius: 25px;
-            text-decoration: none;
-            text-color: #ffffff;
-            font-weight: 600;
-            transition: background 0.3s;
-        }
-
-        .get-started-btn:hover {
-            background: #5a4fcf;
-        }
-
-        /* Main Content */
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 2rem;
-        }
-
-        .page-header {
-            text-align: center;
-            margin-bottom: 3rem;
-        }
-
-        .page-title {
-            font-size: 2.5rem;
-            color: #2d5a27;
-            margin-bottom: 1rem;
-        }
-
-        .page-subtitle {
-            font-size: 1.1rem;
-            color: #666;
-            max-width: 600px;
-            margin: 0 auto;
-        }
-
-        /* Student Info Card */
-        .student-info {
-            background: white;
-            border-radius: 15px;
-            padding: 2rem;
-            margin-bottom: 2rem;
-            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
-        }
-
-        .student-header {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-            margin-bottom: 1.5rem;
-        }
-
-        .student-avatar {
-            width: 60px;
-            height: 60px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-size: 1.5rem;
-            font-weight: bold;
-        }
-
-        .student-details h3 {
-            color: #2d5a27;
-            font-size: 1.3rem;
-            margin-bottom: 0.3rem;
-        }
-
-        .student-details p {
-            color: #666;
-        }
-
-        /* Stats Grid */
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 1.5rem;
-            margin-bottom: 3rem;
-        }
-
-        .stat-card {
-            background: white;
-            border-radius: 15px;
-            padding: 1.5rem;
-            text-align: center;
-            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
-            transition: transform 0.3s;
-        }
-
-        .stat-card:hover {
-            transform: translateY(-5px);
-        }
-
-        .stat-number {
-            font-size: 2.5rem;
-            font-weight: bold;
-            color: #2d5a27;
-            margin-bottom: 0.5rem;
-        }
-
-        .stat-label {
-            color: #666;
-            font-weight: 500;
-        }
-
-        .stat-icon {
-            font-size: 2rem;
-            margin-bottom: 1rem;
-        }
-
-        /* Charts Section */
-        .charts-section {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 2rem;
-            margin-bottom: 3rem;
-        }
-
-        .chart-container {
-            background: white;
-            border-radius: 15px;
-            padding: 2rem;
-            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
-        }
-
-        .chart-title {
-            font-size: 1.3rem;
-            color: #2d5a27;
-            margin-bottom: 1.5rem;
-            text-align: center;
-        }
-
-        /* Attendance Calendar */
-        .calendar-section {
-            background: white;
-            border-radius: 15px;
-            padding: 2rem;
-            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
-        }
-
-        .calendar-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 2rem;
-        }
-
-        .calendar-title {
-            font-size: 1.3rem;
-            color: #2d5a27;
-        }
-
-        .month-selector {
-            padding: 0.5rem 1rem;
-            border: 2px solid #e0e0e0;
-            border-radius: 8px;
-            background: white;
-            color: #666;
-            font-weight: 500;
-        }
-
-        .calendar-grid {
-            display: grid;
-            grid-template-columns: repeat(7, 1fr);
-            gap: 0.5rem;
-        }
-
-        .calendar-day {
-            aspect-ratio: 1;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 8px;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-
-        .calendar-day.header {
-            background: #f8f9fa;
-            color: #666;
-            font-weight: 600;
-            cursor: default;
-        }
-
-        .calendar-day.present {
-            background: #2d5a27;
-            color: white;
-        }
-
-        .calendar-day.absent {
-            background: #ff6b6b;
-            color: white;
-        }
-
-        .calendar-day.today {
-            border: 2px solid #6c5ce7;
-        }
-
-        .calendar-day:hover:not(.header) {
-            transform: scale(1.1);
-        }
-
-        /* Legend */
-        .legend {
-            display: flex;
-            justify-content: center;
-            gap: 2rem;
-            margin-top: 1.5rem;
-        }
-
-        .legend-item {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .legend-color {
-            width: 20px;
-            height: 20px;
-            border-radius: 4px;
-        }
-
-        .legend-color.present {
-            background: #2d5a27;
-        }
-
-        .legend-color.absent {
-            background: #ff6b6b;
-        }
-
-        /* Responsive */
-        @media (max-width: 768px) {
-            .charts-section {
-                grid-template-columns: 1fr;
-            }
-            
-            .nav-links {
-                gap: 1rem;
-            }
-            
-            .container {
-                padding: 1rem;
-            }
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Attendance - ZenFlow Yoga Studio</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+/* --- Styles (same as your previous code) --- */
+* {margin:0; padding:0; box-sizing:border-box;}
+body {font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background:linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%); min-height:100vh;}
+.navbar{background:white; padding:1rem 2rem; box-shadow:0 2px 10px rgba(0,0,0,0.1); position:sticky; top:0; z-index:100;}
+.nav-container{display:flex; justify-content:space-between; align-items:center; max-width:1200px; margin:0 auto;}
+.logo{font-size:1.8rem; font-weight:bold; color:#2d5a27; font-style:italic;}
+.nav-links{display:flex; list-style:none; gap:2rem; align-items:center;}
+.nav-links a{text-decoration:none; color:#666; font-weight:500; transition:color 0.3s;}
+.nav-links a:hover, .nav-links a.active{color:#2d5a27;}
+.get-started-btn{background:#6c5ce7; color:white; padding:0.7rem 1.5rem; border-radius:25px; text-decoration:none; font-weight:600; transition:background 0.3s;}
+.get-started-btn:hover{background:#5a4fcf;}
+.container{max-width:1200px; margin:0 auto; padding:2rem;}
+.page-header{text-align:center; margin-bottom:3rem;}
+.page-title{font-size:2.5rem; color:#2d5a27; margin-bottom:1rem;}
+.page-subtitle{font-size:1.1rem; color:#666; max-width:600px; margin:0 auto;}
+.student-info{background:white; border-radius:15px; padding:2rem; margin-bottom:2rem; box-shadow:0 5px 20px rgba(0,0,0,0.1);}
+.student-header{display:flex; align-items:center; gap:1rem; margin-bottom:1.5rem;}
+.student-avatar{width:60px; height:60px; border-radius:50%; background:linear-gradient(135deg, #667eea 0%, #764ba2 100%); display:flex; align-items:center; justify-content:center; color:white; font-size:1.5rem; font-weight:bold;}
+.student-details h3{color:#2d5a27; font-size:1.3rem; margin-bottom:0.3rem;}
+.student-details p{color:#666;}
+.stats-grid{display:grid; grid-template-columns:repeat(auto-fit, minmax(200px,1fr)); gap:1.5rem; margin-bottom:3rem;}
+.stat-card{background:white; border-radius:15px; padding:1.5rem; text-align:center; box-shadow:0 5px 20px rgba(0,0,0,0.1); transition:transform 0.3s;}
+.stat-card:hover{transform:translateY(-5px);}
+.stat-number{font-size:2.5rem; font-weight:bold; color:#2d5a27; margin-bottom:0.5rem;}
+.stat-label{color:#666; font-weight:500;}
+.stat-icon{font-size:2rem; margin-bottom:1rem;}
+.charts-section{display:grid; grid-template-columns:1fr 1fr; gap:2rem; margin-bottom:3rem;}
+.chart-container{background:white; border-radius:15px; padding:2rem; box-shadow:0 5px 20px rgba(0,0,0,0.1);}
+.chart-title{font-size:1.3rem; color:#2d5a27; margin-bottom:1.5rem; text-align:center;}
+.calendar-section{background:white; border-radius:15px; padding:2rem; box-shadow:0 5px 20px rgba(0,0,0,0.1);}
+.calendar-header{display:flex; justify-content:space-between; align-items:center; margin-bottom:2rem;}
+.calendar-title{font-size:1.3rem; color:#2d5a27;}
+.month-selector{padding:0.5rem 1rem; border:2px solid #e0e0e0; border-radius:8px; background:white; color:#666; font-weight:500;}
+.calendar-grid{display:grid; grid-template-columns:repeat(7,1fr); gap:0.5rem;}
+.calendar-day{aspect-ratio:1; display:flex; align-items:center; justify-content:center; border-radius:8px; font-weight:500; cursor:pointer; transition:all 0.3s;}
+.calendar-day.header{background:#f8f9fa; color:#666; font-weight:600; cursor:default;}
+.calendar-day.present{background:#2d5a27; color:white;}
+.calendar-day.absent{background:#ff6b6b; color:white;}
+.calendar-day.today{border:2px solid #6c5ce7;}
+.calendar-day:hover:not(.header){transform:scale(1.1);}
+.legend{display:flex; justify-content:center; gap:2rem; margin-top:1.5rem;}
+.legend-item{display:flex; align-items:center; gap:0.5rem;}
+.legend-color{width:20px; height:20px; border-radius:4px;}
+.legend-color.present{background:#2d5a27;}
+.legend-color.absent{background:#ff6b6b;}
+@media (max-width:768px){.charts-section{grid-template-columns:1fr;}.nav-links{gap:1rem;}.container{padding:1rem;}}
+</style>
 </head>
 <body>
-    <!-- Navigation -->
-    <nav class="navbar">
-        <div class="nav-container">
-            <div class="logo">ZenFlow</div>
-            <ul class="nav-links">
-                <li><a href="/">Home</a></li>
-                <li><a href="/attendance" class="active">Attendance</a></li>
-                <li><a href="/about">About</a></li>
-                <li><a href="/contact">Contact</a></li>
-                <li><a href="/logins" class="get-started-btn">Logout</a></li>
-            </ul>
-        </div>
-    </nav>
+<!-- Navigation -->
+<nav class="navbar">
+    <div class="nav-container">
+        <div class="logo">ZenFlow</div>
+        <ul class="nav-links">
+            <li><a href="/">Home</a></li>
+            <li><a href="/attendance" class="active">Attendance</a></li>
+            <li><a href="/about">About</a></li>
+            <li><a href="/contact">Contact</a></li>
+            <li><a href="/logins" class="get-started-btn">Logout</a></li>
+        </ul>
+    </div>
+</nav>
 
-    <!-- Main Content -->
-    <div class="container">
-        <!-- Page Header -->
-        <div class="page-header">
-            <h1 class="page-title">Attendance Dashboard</h1>
-            <p class="page-subtitle">Track your yoga journey and monitor your class attendance progress</p>
-        </div>
+<div class="container">
+    <div class="page-header">
+        <h1 class="page-title">Attendance Dashboard</h1>
+        <p class="page-subtitle">Track your yoga journey and monitor your class attendance progress</p>
+    </div>
 
-        <!-- Student Info -->
-        <div class="student-info">
-            <div class="student-header">
-                <div class="student-avatar" id="studentAvatar">{{ student.name.0|upper }}</div>
-                <div class="student-details">
-                    <h3 id="studentName">{{ student_name|default:"John Doe" }}</h3>
-                    <p id="studentEmail">{{ student_email|default:"john.doe@email.com" }}</p>
-                </div>
-            </div>
-        </div>
-
-        <!-- Stats Grid -->
-        <div class="stats-grid">
-            <div class="stat-card">
-                <div class="stat-icon">📅</div>
-                <div class="stat-number" id="totalDays">{{ attendance_stats.total_days|default:"30" }}</div>
-                <div class="stat-label">Total Days</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-icon">✅</div>
-                <div class="stat-number" id="presentDays">{{ attendance_stats.present_days|default:"24" }}</div>
-                <div class="stat-label">Days Present</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-icon">❌</div>
-                <div class="stat-number" id="absentDays">{{ attendance_stats.absent_days|default:"6" }}</div>
-                <div class="stat-label">Days Absent</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-icon">📊</div>
-                <div class="stat-number" id="attendanceRate">{{ attendance_stats.attendance_rate|default:"80" }}%</div>
-                <div class="stat-label">Attendance Rate</div>
-            </div>
-        </div>
-
-        <!-- Charts Section -->
-        <div class="charts-section">
-            <div class="chart-container">
-                <h3 class="chart-title">Monthly Attendance Trend</h3>
-                <canvas id="attendanceChart"></canvas>
-            </div>
-            <div class="chart-container">
-                <h3 class="chart-title">Attendance Distribution</h3>
-                <canvas id="pieChart"></canvas>
-            </div>
-        </div>
-
-        <!-- Calendar Section -->
-        <div class="calendar-section">
-            <div class="calendar-header">
-                <h3 class="calendar-title">Attendance Calendar</h3>
-                <select class="month-selector" id="monthSelector">
-                    <option value="0">January 2024</option>
-                    <option value="1">February 2024</option>
-                    <option value="2">March 2024</option>
-                    <option value="3">April 2024</option>
-                    <option value="4" selected>May 2024</option>
-                    <option value="5">June 2024</option>
-                </select>
-            </div>
-            <div class="calendar-grid" id="calendarGrid">
-                <!-- Calendar will be generated by JavaScript -->
-            </div>
-            <div class="legend">
-                <div class="legend-item">
-                    <div class="legend-color present"></div>
-                    <span>Present</span>
-                </div>
-                <div class="legend-item">
-                    <div class="legend-color absent"></div>
-                    <span>Absent</span>
-                </div>
+    <div class="student-info">
+        <div class="student-header">
+            <div class="student-avatar" id="studentAvatar">{{ student.name.0|upper }}</div>
+            <div class="student-details">
+                <h3 id="studentName">{{ student_name|default:"John Doe" }}</h3>
+                <p id="studentEmail">{{ student_email|default:"john.doe@email.com" }}</p>
             </div>
         </div>
     </div>
 
-    <script>
-        // Sample data - In Django, this would come from your MySQL database
-        const attendanceData = {
-            monthly: [20, 22, 18, 24, 26, 23], // Last 6 months
-            daily: {{ attendance_records|default:"[1,1,0,1,1,1,0,1,1,1,0,1,1,1,1,0,1,1,1,1,0,1,1,1,1,1,0,1,1,1]"|safe }},
-            stats: {
-                present: {{ attendance_stats.present_days|default:"24" }},
-                absent: {{ attendance_stats.absent_days|default:"6" }}
-            }
-        };
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-icon">📅</div>
+            <div class="stat-number" id="totalDays">0</div>
+            <div class="stat-label">Total Days</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon">✅</div>
+            <div class="stat-number" id="presentDays">0</div>
+            <div class="stat-label">Days Present</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon">❌</div>
+            <div class="stat-number" id="absentDays">0</div>
+            <div class="stat-label">Days Absent</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon">📊</div>
+            <div class="stat-number" id="attendanceRate">0%</div>
+            <div class="stat-label">Attendance Rate</div>
+        </div>
+    </div>
 
-        // Initialize Charts
-        function initCharts() {
-            // Monthly Attendance Chart
-            const ctx1 = document.getElementById('attendanceChart').getContext('2d');
-            new Chart(ctx1, {
-                type: 'line',
-                data: {
-                    labels: ['Dec', 'Jan', 'Feb', 'Mar', 'Apr', 'May'],
-                    datasets: [{
-                        label: 'Days Present',
-                        data: attendanceData.monthly,
-                        borderColor: '#2d5a27',
-                        backgroundColor: 'rgba(45, 90, 39, 0.1)',
-                        borderWidth: 3,
-                        fill: true,
-                        tension: 0.4
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    plugins: {
-                        legend: {
-                            display: false
-                        }
-                    },
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            max: 30
-                        }
-                    }
-                }
-            });
+    <div class="charts-section">
+        <div class="chart-container">
+            <h3 class="chart-title">Monthly Attendance Trend</h3>
+            <canvas id="attendanceChart"></canvas>
+        </div>
+        <div class="chart-container">
+            <h3 class="chart-title">Attendance Distribution</h3>
+            <canvas id="pieChart"></canvas>
+        </div>
+    </div>
 
-            // Pie Chart
-            const ctx2 = document.getElementById('pieChart').getContext('2d');
-            new Chart(ctx2, {
-                type: 'doughnut',
-                data: {
-                    labels: ['Present', 'Absent'],
-                    datasets: [{
-                        data: [attendanceData.stats.present, attendanceData.stats.absent],
-                        backgroundColor: ['#2d5a27', '#ff6b6b'],
-                        borderWidth: 0
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    plugins: {
-                        legend: {
-                            position: 'bottom'
-                        }
-                    }
-                }
-            });
-        }
+    <div class="calendar-section">
+        <div class="calendar-header">
+            <h3 class="calendar-title">Attendance Calendar</h3>
+            <select class="month-selector" id="monthSelector"></select>
+        </div>
+        <div class="calendar-grid" id="calendarGrid"></div>
+        <div class="legend">
+            <div class="legend-item">
+                <div class="legend-color present"></div>
+                <span>Present</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color absent"></div>
+                <span>Absent</span>
+            </div>
+        </div>
+    </div>
+</div>
 
-        // Generate Calendar
-        function generateCalendar() {
-            const grid = document.getElementById('calendarGrid');
-            const monthSelector = document.getElementById('monthSelector');
-            const selectedMonth = parseInt(monthSelector.value);
-            
-            // Clear existing calendar
-            grid.innerHTML = '';
-            
-            // Add day headers
-            const dayHeaders = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-            dayHeaders.forEach(day => {
-                const dayElement = document.createElement('div');
-                dayElement.className = 'calendar-day header';
-                dayElement.textContent = day;
-                grid.appendChild(dayElement);
-            });
-            
-            // Get first day of month and number of days
-            const firstDay = new Date(2024, selectedMonth, 1).getDay();
-            const daysInMonth = new Date(2024, selectedMonth + 1, 0).getDate();
-            
-            // Add empty cells for days before month starts
-            for (let i = 0; i < firstDay; i++) {
-                const emptyDay = document.createElement('div');
-                emptyDay.className = 'calendar-day';
-                grid.appendChild(emptyDay);
-            }
-            
-            // Add days of the month
-            for (let day = 1; day <= daysInMonth; day++) {
-                const dayElement = document.createElement('div');
-                dayElement.className = 'calendar-day';
-                dayElement.textContent = day;
-                
-                // Add attendance status (sample data)
-                if (day <= attendanceData.daily.length) {
-                    if (attendanceData.daily[day - 1] === 1) {
-                        dayElement.classList.add('present');
-                    } else {
-                        dayElement.classList.add('absent');
-                    }
-                }
-                
-                // Mark today
-                const today = new Date();
-                if (selectedMonth === today.getMonth() && day === today.getDate()) {
-                    dayElement.classList.add('today');
-                }
-                
-                grid.appendChild(dayElement);
-            }
-        }
+<script>
+let attendanceData = null;
 
-        // Event Listeners
-        document.getElementById('monthSelector').addEventListener('change', generateCalendar);
+function populateMonthSelector() {
+    const monthSelector = document.getElementById("monthSelector");
+    const months = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+    const currentYear = new Date().getFullYear();
+    const currentMonth = new Date().getMonth();
+    monthSelector.innerHTML = "";
+    months.forEach((month,index)=>{
+        const option = document.createElement("option");
+        option.value = index;
+        option.textContent = `${month} ${currentYear}`;
+        if(index===currentMonth) option.selected=true;
+        monthSelector.appendChild(option);
+    });
+}
 
-        // Initialize everything when page loads
-        document.addEventListener('DOMContentLoaded', function() {
-            initCharts();
-            generateCalendar();
-        });
+async function fetchAttendanceData() {
+    try {
+        const response = await fetch("/api/attendance-data/");
+        const data = await response.json();
+        if(data.error){console.error(data.error); return;}
+        attendanceData = data;
 
-        // Django integration functions
-        function updateAttendanceData() {
-            // This function would be called to fetch updated data from Django backend
-            fetch('/api/attendance-data/')
-                .then(response => response.json())
-                .then(data => {
-                    // Update charts and calendar with new data
-                    document.getElementById('totalDays').textContent = data.total_days;
-                    document.getElementById('presentDays').textContent = data.present_days;
-                    document.getElementById('absentDays').textContent = data.absent_days;
-                    document.getElementById('attendanceRate').textContent = data.attendance_rate + '%';
-                    
-                    // Regenerate charts and calendar
-                    initCharts();
-                    generateCalendar();
-                })
-                .catch(error => console.error('Error fetching attendance data:', error));
-        }
-    </script>
+        document.getElementById("totalDays").textContent = data.total_days;
+        document.getElementById("presentDays").textContent = data.present_days;
+        document.getElementById("absentDays").textContent = data.absent_days;
+        document.getElementById("attendanceRate").textContent = data.attendance_rate + "%";
+
+        initCharts(data);
+        generateCalendar(data);
+    } catch(e){console.error("Error fetching attendance data:", e);}
+}
+
+function initCharts(data){
+    const ctx1=document.getElementById('attendanceChart').getContext('2d');
+    new Chart(ctx1,{type:'line',data:{labels:['Jan','Feb','Mar','Apr','May','Jun'],datasets:[{label:'Days Present',data:data.monthly,borderColor:'#2d5a27',backgroundColor:'rgba(45,90,39,0.1)',borderWidth:3,fill:true,tension:0.4} ]}, options:{responsive:true,plugins:{legend:{display:false}}, scales:{y:{beginAtZero:true,max:30}}}});
+    const ctx2=document.getElementById('pieChart').getContext('2d');
+    new Chart(ctx2,{type:'doughnut',data:{labels:['Present','Absent'],datasets:[{data:[data.present_days,data.absent_days],backgroundColor:['#2d5a27','#ff6b6b'],borderWidth:0} ]}, options:{responsive:true,plugins:{legend:{position:'bottom'}}}});
+}
+
+function generateCalendar(data){
+    const grid = document.getElementById('calendarGrid');
+    const monthSelector = document.getElementById('monthSelector');
+    const selectedMonth = parseInt(monthSelector.value);
+    const year = new Date().getFullYear();
+    grid.innerHTML = '';
+
+    const dayHeaders = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+    dayHeaders.forEach(day => {
+        const dayElement = document.createElement('div');
+        dayElement.className = 'calendar-day header';
+        dayElement.textContent = day;
+        grid.appendChild(dayElement);
+    });
+
+    const firstDay = new Date(year, selectedMonth, 1).getDay();
+    const daysInMonth = new Date(year, selectedMonth + 1, 0).getDate();
+    for(let i=0;i<firstDay;i++) grid.appendChild(document.createElement('div')).className='calendar-day';
+
+    // Normalize attendance data keys
+    const attendanceMap = {};
+    for(const key in data.attendance_by_date){
+        const normalizedKey = normalizeDateKey(key);
+        attendanceMap[normalizedKey] = data.attendance_by_date[key];
+    }
+
+    for(let day=1; day<=daysInMonth; day++){
+        const dayElement = document.createElement('div');
+        dayElement.className='calendar-day';
+        dayElement.textContent = day;
+
+        const dateKey = `${year}-${String(selectedMonth + 1).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
+        const status = attendanceMap[dateKey];
+        if(status !== undefined) dayElement.classList.add(status == 1 ? 'present' : 'absent');
+
+        const today = new Date();
+        if(selectedMonth === today.getMonth() && day === today.getDate()) dayElement.classList.add('today');
+
+        grid.appendChild(dayElement);
+    }
+}
+
+// Helper to normalize any date string to YYYY-MM-DD
+function normalizeDateKey(dateString){
+    const d = new Date(dateString);
+    const y = d.getFullYear();
+    const m = String(d.getMonth()+1).padStart(2,'0');
+    const day = String(d.getDate()).padStart(2,'0');
+    return `${y}-${m}-${day}`;
+}
+
+document.addEventListener("DOMContentLoaded",()=>{
+    populateMonthSelector();
+    fetchAttendanceData();
+    document.getElementById('monthSelector').addEventListener('change',()=>generateCalendar(attendanceData));
+});
+</script>
+
 </body>
 </html>

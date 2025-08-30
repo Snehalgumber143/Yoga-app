@@ -1,362 +1,349 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>Zenglow - Admin Portal</title>
+  <meta charset="UTF-8">
+  <title>Yoga Admin Portal</title>
   <style>
-    /* Navbar */
-    nav {
-      background-color: #222;
-      color: #eee;
-      padding: 15px 20px;
-      font-size: 20px;
-      font-weight: bold;
-      font-family: Arial, sans-serif;
-    }
+    html, body {
+  height: 100%;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+}
 
-    /* Layout */
+.main-content {
+  flex: 1;
+}
     body {
-      font-family: Arial, sans-serif;
+      font-family: "Segoe UI", sans-serif;
+      background: #f0fdf4; /* very light green */
       margin: 0;
+      height: 100%;
       padding: 0;
-      background: #f9f9f9;
+      color: #2e4d2c;
     }
-    .container {
+
+    header {
+      background: linear-gradient(135deg, #3bb78f, #0bab64);
+      color: white;
+      padding: 15px 20px;
       display: flex;
-      padding: 20px;
+      align-items: center;
+      justify-content: space-between;
+      box-shadow: 0 3px 6px rgba(0,0,0,0.15);
     }
 
-    /* Student List */
-    .student-list {
-      max-width: 300px;
-      margin-right: 40px;
-      background: white;
-      border: 1px solid #ccc;
-      border-radius: 4px;
-      height: calc(100vh - 80px);
-      overflow-y: auto;
+    header img {
+      height: 50px;
     }
-    .student-list h3 {
+
+    header h1 {
       margin: 0;
-      padding: 10px;
-      border-bottom: 1px solid #ccc;
-      background: #f0f0f0;
-    }
-    .student-list ul {
-      list-style: none;
-      margin: 0;
-      padding: 0;
-    }
-    .student-list li {
-      padding: 10px;
-      cursor: pointer;
-      border-bottom: 1px solid #eee;
-      transition: background-color 0.2s ease;
-    }
-    .student-list li:hover {
-      background-color: #ddd;
-    }
-    .student-list li.active {
-      background-color: #a6f3a6;
+      font-size: 24px;
       font-weight: bold;
+      letter-spacing: 1px;
     }
 
-    /* Details */
-    .student-details {
-      flex-grow: 1;
-      background: white;
-      padding: 20px;
-      border-radius: 4px;
-      box-shadow: 0 0 6px #ccc;
-      max-height: calc(100vh - 80px);
-      overflow-y: auto;
-    }
-    .student-info p {
-      margin: 6px 0;
-    }
-
-    /* Calendar */
-    table.calendar {
-      border-collapse: collapse;
-      margin-top: 20px;
-      width: 100%;
-      max-width: 480px;
-    }
-    table.calendar th, table.calendar td {
-      border: 1px solid #ccc;
-      padding: 8px 0;
+    h2, h3 {
       text-align: center;
-      vertical-align: middle;
-      width: 14.28%; /* 100/7 */
-      cursor: pointer;
-      user-select: none;
-    }
-    table.calendar th {
-      background: #f0f0f0;
-    }
-    table.calendar td.present {
-      background-color: #a6f3a6;
-    }
-    table.calendar td.absent {
-      background-color: #f3a6a6;
-    }
-    table.calendar td.no-record {
-      background-color: #eee;
-      cursor: default;
+      margin: 20px 0;
+      color: #14532d;
     }
 
-    #saveAttendanceBtn {
-      margin-top: 15px;
-      padding: 10px 20px;
+    .student-select {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 20px;
+    }
+
+    .student-select select {
+      padding: 10px;
       font-size: 16px;
-      cursor: pointer;
-      background-color: #222;
+      border-radius: 8px;
+      border: 2px solid #000000ff;
+      background: #fff;
+      transition: 0.3s;
+    }
+
+    .student-select select:focus {
+      border-color: #0bab64;
+      outline: none;
+      box-shadow: 0 0 5px #3bb78f;
+    }
+
+    .calendar-header {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 1rem;
+      margin-bottom: 1rem;
+      font-size: 18px;
+      font-weight: bold;
+      color: #14532d;
+    }
+
+    .calendar-header button {
+      padding: 6px 12px;
+      font-size: 16px;
+      background: #3bb78f;
       color: white;
       border: none;
-      border-radius: 4px;
-      transition: background-color 0.3s ease;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+    .calendar-header button:hover {
+      background: #0bab64;
+    }
+
+    table.calendar {
+      border-collapse: collapse;
+      width: 100%;
+      max-width: 700px;
+      margin: auto;
+      background: #ffffff;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    }
+
+    table.calendar th {
+      background: #14532d;
+      color: white;
+      padding: 12px;
+      font-weight: bold;
+    }
+
+    table.calendar td {
+      border: 1px solid #d1fae5;
+      height: 70px;
+      text-align: center;
+      vertical-align: middle;
+      cursor: pointer;
+      transition: background-color 0.2s ease;
+      font-size: 15px;
+    }
+
+    table.calendar td:hover {
+      background-color: #e6f9f0;
+    }
+
+    .present { background-color: #bbf7d0 !important; }
+    .absent { background-color: #fecaca !important; }
+    .no-record { background-color: #f0fdf4; cursor: not-allowed; }
+
+    #saveAttendanceBtn {
+      display: block;
+      margin: 25px auto;
+      padding: 12px 25px;
+      font-size: 16px;
+      border: none;
+      background: linear-gradient(135deg, #0bab64, #3bb78f);
+      color: white;
+      border-radius: 30px;
+      cursor: pointer;
+      font-weight: bold;
+      letter-spacing: 1px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+      transition: transform 0.2s ease, background 0.3s ease;
     }
     #saveAttendanceBtn:hover {
-      background-color: #444;
+      transform: translateY(-2px);
+      background: linear-gradient(135deg, #3bb78f, #0bab64);
+    }
+
+    footer {
+      text-align: center;
+      margin-top: 40px;
+      padding: 15px;
+      background: #14532d;
+      color: white;
+      align: bottom;
+      font-size: 14px;
     }
   </style>
 </head>
 <body>
-  <nav>Zenglow</nav>
+  <!-- Header with Logo -->
+  <header>
+    <div style="display:flex; align-items:center; gap:10px;">
+      <!--<img src="/static/logo.png" alt="Yoga Logo">  put your logo in static/logo.png -->
+      <h1>Zenglow Admin Portal</h1>
+    </div>
+  </header>
 
-  <div class="container">
-    <div class="student-list">
-      <h3>Students</h3>
-      <ul>
-        {% for stu in students %}
-          <li
-            onclick="window.location='?student_id={{ stu.id }}'"
-            class="{% if student and stu.id == student.id %}active{% endif %}">
-            {{ stu.name }}
-          </li>
+  <h2>Manage Attendance</h2>
+
+  <!-- Student Dropdown -->
+  <div class="student-select">
+    <form method="get" action="">
+      <select name="student_id" onchange="this.form.submit()">
+        <option value="">-- Select Student --</option>
+        {% for s in students %}
+          <option value="{{ s.id }}" {% if student and student.id == s.id %}selected{% endif %}>
+            {{ s.name }}
+          </option>
         {% endfor %}
-      </ul>
-    </div>
-
-    <div class="student-details">
-      {% if student %}
-        <h3>Student Details</h3>
-        <div class="student-info">
-          <p><strong>Name:</strong> {{ student.name }}</p>
-          <p><strong>Email:</strong> {{ student.email }}</p>
-          <p><strong>Height:</strong> {{ student.height }} cm</p>
-          <p><strong>Weight:</strong> {{ student.weight }} kg</p>
-          <p><strong>Age:</strong> {{ student.age }}</p>
-          <p><strong>Gender:</strong> {{ student.gender }}</p>
-        </div>
-
-        <h3>Attendance Calendar - {{ student.name }}</h3>
-        <div id="calendar"></div>
-        <button id="saveAttendanceBtn">Save Attendance</button>
-      {% else %}
-        <p>Select a student from the list to see their attendance details.</p>
-      {% endif %}
-    </div>
+      </select>
+    </form>
   </div>
 
-  <!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <title>Admin Portal - Student Attendance</title>
-  <style>
-    body { font-family: Arial, sans-serif; margin: 0; background: #f9f9f9; }
-    nav { background-color: #444; color: white; padding: 10px 20px; font-size: 18px; }
-    h2, h3 { color: #333; margin-top: 20px; }
-    table { border-collapse: collapse; margin-top: 20px; }
-    th, td { border: 1px solid #ccc; padding: 8px 12px; text-align: center; }
-    .calendar-header {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 1rem;
-  margin-bottom: 1rem;
-}
-
-.calendar-header button {
-  padding: 5px 10px;
-  font-size: 18px;
-}
-
-    .calendar td {
-  width: 40px;
-  height: 40px;
-  text-align: center;
-  vertical-align: middle;
-  cursor: pointer;
-  transition: background-color 0.2s ease;
-}
-
-.calendar td:hover {
-  background-color: #eee;
-}
-
-.present { background-color: #a6f3a6 !important; }
-.absent { background-color: #f3a6a6 !important; }
-.no-record {
-  background-color: #ddd;
-  cursor: not-allowed;
-}
-
-    .student-info { margin-bottom: 20px; }
-    .student-list { max-width: 300px; float: left; margin-right: 40px; }
-    .student-list ul { list-style: none; padding: 0; }
-    .student-list li { padding: 6px; cursor: pointer; border-bottom: 1px solid #ccc; }
-    .student-list li:hover { background-color: #ddd; }
-    #saveAttendanceBtn { margin-top: 20px; padding: 10px 20px; font-size: 16px; background-color: #28a745; color: white; border: none; cursor: pointer; }
-    #saveAttendanceBtn:hover { background-color: #218838; }
-  </style>
-</head>
-<body>
-
-  <nav>Zenglow</nav>
-
-  <div class="student-list">
-    <h3>Students</h3>
-    <ul>
-      {% for stu in students %}
-        <li onclick="window.location='?student_id={{ stu.id }}'">
-          {{ stu.name }}
-        </li>
-      {% endfor %}
-    </ul>
-  </div>
-
-  <div class="student-details" style="overflow: hidden;">
-    {% if student %}
-      <h3>Student Details</h3>
-      <div class="student-info">
-        <p><strong>Name:</strong> {{ student.name }}</p>
-        <p><strong>Email:</strong> {{ student.email }}</p>
-        <p><strong>Height:</strong> {{ student.height }} cm</p>
-        <p><strong>Weight:</strong> {{ student.weight }} kg</p>
-        <p><strong>Age:</strong> {{ student.age }}</p>
-        <p><strong>Gender:</strong> {{ student.gender }}</p>
-      </div>
-
-      <h3>Attendance Calendar - {{ student.name }}</h3>
-      <div id="calendar" data-student-id="{{ student.id }}"></div>
-      <button id="saveAttendanceBtn">Save Attendance</button>
-    {% else %}
-      <p>Select a student from the list to see their attendance details.</p>
-    {% endif %}
-  </div>
-<div id="calendar" data-student-id="{{ student.id }}"></div>
-
-<script>
   {% if student %}
-  const attendance = {{ attendance_map|safe }};
-  const calendarDiv = document.getElementById('calendar');
-  const studentId = calendarDiv.dataset.studentId;
+    <h3>Attendance Calendar - {{ student.name }}</h3>
 
-  const today = new Date();
-  const year = today.getFullYear();
-  const month = today.getMonth();
-  const daysInMonth = new Date(year, month + 1, 0).getDate();
-  const firstDayWeekday = new Date(year, month, 1).getDay();
+    <div class="calendar-header">
+      <button id="prevMonth">&lt;</button>
+      <span id="monthYear"></span>
+      <button id="nextMonth">&gt;</button>
+    </div>
 
-  let html = '<table class="calendar"><thead><tr>';
-  const weekdays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-  weekdays.forEach(day => html += `<th>${day}</th>`);
-  html += '</tr></thead><tbody><tr>';
+    <div id="calendar" data-student-id="{{ student.id }}"></div>
 
-  let dayCounter = 1;
-  let dayOfWeek = firstDayWeekday;
-
-  // Empty cells before the 1st
-  for (let i = 0; i < firstDayWeekday; i++) {
-    html += '<td class="no-record"></td>';
-  }
-
-  while (dayCounter <= daysInMonth) {
-    const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(dayCounter).padStart(2, '0')}`;
-    const status = attendance[dateStr];
-
-    let className = '';
-    if (status === 'present' || status === '1') className = 'present';
-    else if (status === 'absent' || status === '0') className = 'absent';
-
-    html += `<td class="${className}" data-date="${dateStr}" title="Click to toggle">${dayCounter}</td>`;
-    dayCounter++;
-    dayOfWeek++;
-
-    if (dayOfWeek % 7 === 0 && dayCounter <= daysInMonth) {
-      html += '</tr><tr>';
-    }
-  }
-
-  // Fill remaining empty cells
-  while (dayOfWeek % 7 !== 0) {
-    html += '<td class="no-record"></td>';
-    dayOfWeek++;
-  }
-
-  html += '</tr></tbody></table>';
-  calendarDiv.innerHTML = html;
-
-  // Enable click toggling
-  const cells = calendarDiv.querySelectorAll('td[data-date]');
-  cells.forEach(cell => {
-    cell.addEventListener('click', () => {
-      if (cell.classList.contains('present')) {
-        cell.classList.remove('present');
-        cell.classList.add('absent');
-      } else if (cell.classList.contains('absent')) {
-        cell.classList.remove('absent');
-      } else {
-        cell.classList.add('present');
-      }
-    });
-  });
-
-  // Save Attendance Button Logic
-  document.getElementById('saveAttendanceBtn').addEventListener('click', () => {
-    const attendanceData = [];
-
-    cells.forEach(cell => {
-      const date = cell.getAttribute('data-date');
-      let status = null;
-      if (cell.classList.contains('present')) status = 'present';
-      else if (cell.classList.contains('absent')) status = 'absent';
-
-      if (status !== null) {
-        attendanceData.push({
-          student_id: studentId,
-          date: date,
-          class_type: 'Yoga', // Customize this
-          instructor: 'John', // Customize this
-          status: status
-        });
-      }
-    });
-
-    fetch('/save-attendance/', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'X-CSRFToken': '{{ csrf_token }}'
-      },
-      body: JSON.stringify({ attendance_data: attendanceData })
-    })
-    .then(res => res.json())
-    .then(data => {
-      if (data.success) {
-        alert('Attendance saved successfully!');
-        location.reload();
-      } else {
-        alert('Failed to save: ' + (data.error || 'Unknown error'));
-      }
-    })
-    .catch(err => alert('Save error: ' + err));
-  });
+    <button id="saveAttendanceBtn">💾 Save Attendance</button>
   {% endif %}
-</script>
 
+  <footer>
+    &copy; {{ year|default:2025 }} Yoga Attendance System. All rights reserved.
+  </footer>
 
+  <script>
+    {% if student %}
+    const attendance = {{ attendance_map|safe }};
+    const calendarDiv = document.getElementById('calendar');
+    const studentId = calendarDiv.dataset.studentId;
+
+    let today = new Date();
+    let currentMonth = today.getMonth();
+    let currentYear = today.getFullYear();
+
+    function renderCalendar(year, month) {
+      const daysInMonth = new Date(year, month + 1, 0).getDate();
+      const firstDayWeekday = new Date(year, month, 1).getDay();
+
+      let html = '<table class="calendar"><thead><tr>';
+      const weekdays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+      weekdays.forEach(day => html += `<th>${day}</th>`);
+      html += '</tr></thead><tbody><tr>';
+
+      let dayCounter = 1;
+      let dayOfWeek = firstDayWeekday;
+
+      // Empty cells before start
+      for (let i = 0; i < firstDayWeekday; i++) {
+        html += '<td class="no-record"></td>';
+      }
+
+      while (dayCounter <= daysInMonth) {
+        const dateStr = `${year}-${String(month+1).padStart(2,'0')}-${String(dayCounter).padStart(2,'0')}`;
+        const status = attendance[dateStr];
+
+        let className = '';
+        if (status === 'present' || status === '1') className = 'present';
+        else if (status === 'absent' || status === '0') className = 'absent';
+
+        html += `<td class="${className}" data-date="${dateStr}">${dayCounter}</td>`;
+        dayCounter++;
+        dayOfWeek++;
+
+        if (dayOfWeek % 7 === 0 && dayCounter <= daysInMonth) {
+          html += '</tr><tr>';
+        }
+      }
+
+      // Fill empty after
+      while (dayOfWeek % 7 !== 0) {
+        html += '<td class="no-record"></td>';
+        dayOfWeek++;
+      }
+
+      html += '</tr></tbody></table>';
+      calendarDiv.innerHTML = html;
+
+      // Update month-year
+      const monthNames = [
+        "January","February","March","April","May","June",
+        "July","August","September","October","November","December"
+      ];
+      document.getElementById("monthYear").textContent = monthNames[month] + " " + year;
+
+      // Toggle attendance
+      const cells = calendarDiv.querySelectorAll('td[data-date]');
+      cells.forEach(cell => {
+        cell.addEventListener('click', () => {
+          if (cell.classList.contains('present')) {
+            cell.classList.remove('present');
+            cell.classList.add('absent');
+          } else if (cell.classList.contains('absent')) {
+            cell.classList.remove('absent');
+          } else {
+            cell.classList.add('present');
+          }
+        });
+      });
+    }
+
+    // Init
+    renderCalendar(currentYear, currentMonth);
+
+    document.getElementById("prevMonth").addEventListener("click", () => {
+      currentMonth--;
+      if (currentMonth < 0) {
+        currentMonth = 11;
+        currentYear--;
+      }
+      renderCalendar(currentYear, currentMonth);
+    });
+
+    document.getElementById("nextMonth").addEventListener("click", () => {
+      currentMonth++;
+      if (currentMonth > 11) {
+        currentMonth = 0;
+        currentYear++;
+      }
+      renderCalendar(currentYear, currentMonth);
+    });
+
+    // Save
+    document.getElementById('saveAttendanceBtn').addEventListener('click', () => {
+      const attendanceData = [];
+      const cells = calendarDiv.querySelectorAll('td[data-date]');
+      cells.forEach(cell => {
+        const date = cell.getAttribute('data-date');
+        let status = null;
+        if (cell.classList.contains('present')) status = 'present';
+        else if (cell.classList.contains('absent')) status = 'absent';
+
+        if (status !== null) {
+          attendanceData.push({
+            student_id: studentId,
+            date: date,
+            class_type: 'Yoga',
+            instructor: 'Palak',
+            status: status
+          });
+        }
+      });
+
+      fetch('/save-attendance/', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRFToken': '{{ csrf_token }}'
+        },
+        body: JSON.stringify({ attendance_data: attendanceData })
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (data.success) {
+          alert('✅ Attendance saved successfully!');
+          location.reload();
+        } else {
+          alert('❌ Failed: ' + (data.error || 'Unknown error'));
+        }
+      })
+      .catch(err => alert('Save error: ' + err));
+    });
+    {% endif %}
+  </script>
 </body>
 </html>

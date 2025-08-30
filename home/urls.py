@@ -6,10 +6,17 @@ urlpatterns = [
     path("logins",views.logins,name='logins'),
     path("",views.index,name='home'),
     path("about",views.about,name='about'),
+     path("instructor-login/", 
+         auth_views.LoginView.as_view(
+             template_name="instructor_login.html",
+             redirect_authenticated_user=True
+         ), 
+         name="instructor_login"),
     path("services",views.services,name='services'),
+    path("api/attendance-data/", views.attendance_data_api, name="attendance_data"),
     path("contact",views.contact,name='contact'),
     path("video",views.video,name='video'),
-    path('admin-portal', views.admin_portal, name='admin_portal'),
+    path('admin-portal/', views.admin_portal, name='admin_portal'),
     path('save-attendance/', views.save_attendance, name='save_attendance'),
     path('login/', views.logins, name='logins'),
     path('logout/', auth_views.LogoutView.as_view(next_page='/'), name='logout'),
