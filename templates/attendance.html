@@ -6,7 +6,6 @@
 <title>Attendance - ZenFlow Yoga Studio</title>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <style>
-/* --- Styles (same as your previous code) --- */
 * {margin:0; padding:0; box-sizing:border-box;}
 body {font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background:linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%); min-height:100vh;}
 .navbar{background:white; padding:1rem 2rem; box-shadow:0 2px 10px rgba(0,0,0,0.1); position:sticky; top:0; z-index:100;}
@@ -39,7 +38,12 @@ body {font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background:li
 .calendar-header{display:flex; justify-content:space-between; align-items:center; margin-bottom:2rem;}
 .calendar-title{font-size:1.3rem; color:#2d5a27;}
 .month-selector{padding:0.5rem 1rem; border:2px solid #e0e0e0; border-radius:8px; background:white; color:#666; font-weight:500;}
-.calendar-grid{display:grid; grid-template-columns:repeat(7,1fr); gap:0.5rem;}
+.calendar-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 0.5rem;
+    width: 100%;
+}
 .calendar-day{aspect-ratio:1; display:flex; align-items:center; justify-content:center; border-radius:8px; font-weight:500; cursor:pointer; transition:all 0.3s;}
 .calendar-day.header{background:#f8f9fa; color:#666; font-weight:600; cursor:default;}
 .calendar-day.present{background:#2d5a27; color:white;}
@@ -124,7 +128,7 @@ body {font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background:li
             <h3 class="calendar-title">Attendance Calendar</h3>
             <select class="month-selector" id="monthSelector"></select>
         </div>
-        <div class="calendar-grid" id="calendarGrid"></div>
+        <div class="calendar-grid" id="calendarGrid" data-student-id="{{ student.id }}"></div>
         <div class="legend">
             <div class="legend-item">
                 <div class="legend-color present"></div>
@@ -156,85 +160,165 @@ function populateMonthSelector() {
     });
 }
 
-async function fetchAttendanceData() {
+async function saveAttendance() {
+    const studentId = document.getElementById('calendarGrid').dataset.studentId;
+    const attendanceData = [];
+
+    document.querySelectorAll('#calendarGrid .calendar-day').forEach(dayEl => {
+        const day = dayEl.textContent;
+        const month = parseInt(document.getElementById('monthSelector').value);
+        const year = new Date().getFullYear();
+        const dateStr = `${year}-${String(month+1).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
+
+        if(dayEl.classList.contains('present') || dayEl.classList.contains('absent')) {
+            attendanceData.push({
+                student_id: studentId,
+                date: dateStr,
+                status: dayEl.classList.contains('present') ? 'present' : 'absent',
+                class_type: 'Yoga',
+                instructor: 'Palak'
+            });
+        }
+    });
+
+    try {
+        const res = await fetch('/save-attendance/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': '{{ csrf_token }}'
+            },
+            body: JSON.stringify({ attendance_data: attendanceData })
+        });
+
+        const data = await res.json();
+        if(data.success) alert('Attendance saved!');
+        else alert('Error: ' + (data.error || 'Unknown'));
+    } catch(err) {
+        console.error(err);
+        alert('Save failed');
+    }
+}
+
+function initCharts(data){
+    const ctx1=document.getElementById('attendanceChart').getContext('2d');
+    new Chart(ctx1,{
+        type:'line',
+        data:{
+            labels:['Jan','Feb','Mar','Apr','May','Jun'],
+            datasets:[{
+                label:'Days Present',
+                data:data.monthly,
+                borderColor:'#2d5a27',
+                backgroundColor:'rgba(45,90,39,0.1)',
+                borderWidth:3,
+                fill:true,
+                tension:0.4
+            }]
+        },
+        options:{
+            responsive:true,
+            plugins:{legend:{display:false}},
+            scales:{y:{beginAtZero:true,max:30}}
+        }
+    });
+
+    const ctx2=document.getElementById('pieChart').getContext('2d');
+    new Chart(ctx2,{
+        type:'doughnut',
+        data:{
+            labels:['Present','Absent'],
+            datasets:[{
+                data:[data.present_days,data.absent_days],
+                backgroundColor:['#2d5a27','#ff6b6b'],
+                borderWidth:0
+            }]
+        },
+        options:{
+            responsive:true,
+            plugins:{legend:{position:'bottom'}}
+        }
+    });
+}
+async function refreshAttendance() {
     try {
         const response = await fetch("/api/attendance-data/");
         const data = await response.json();
-        if(data.error){console.error(data.error); return;}
-        attendanceData = data;
+        if (data.error) return;
 
+        // Update stats
         document.getElementById("totalDays").textContent = data.total_days;
         document.getElementById("presentDays").textContent = data.present_days;
         document.getElementById("absentDays").textContent = data.absent_days;
         document.getElementById("attendanceRate").textContent = data.attendance_rate + "%";
 
+        // Update calendar
+        const attendance_by_date = data.attendance_by_date || {};
+        generateCalendar(data, attendance_by_date);
+        // Update charts
         initCharts(data);
-        generateCalendar(data);
-    } catch(e){console.error("Error fetching attendance data:", e);}
+
+
+    } catch (err) {
+        console.error("Error refreshing attendance:", err);
+    }
 }
 
-function initCharts(data){
-    const ctx1=document.getElementById('attendanceChart').getContext('2d');
-    new Chart(ctx1,{type:'line',data:{labels:['Jan','Feb','Mar','Apr','May','Jun'],datasets:[{label:'Days Present',data:data.monthly,borderColor:'#2d5a27',backgroundColor:'rgba(45,90,39,0.1)',borderWidth:3,fill:true,tension:0.4} ]}, options:{responsive:true,plugins:{legend:{display:false}}, scales:{y:{beginAtZero:true,max:30}}}});
-    const ctx2=document.getElementById('pieChart').getContext('2d');
-    new Chart(ctx2,{type:'doughnut',data:{labels:['Present','Absent'],datasets:[{data:[data.present_days,data.absent_days],backgroundColor:['#2d5a27','#ff6b6b'],borderWidth:0} ]}, options:{responsive:true,plugins:{legend:{position:'bottom'}}}});
-}
-
-function generateCalendar(data){
+// Call every 30 seconds
+setInterval(refreshAttendance, 1000);
+function generateCalendar(data, attendance_by_date) {
     const grid = document.getElementById('calendarGrid');
     const monthSelector = document.getElementById('monthSelector');
     const selectedMonth = parseInt(monthSelector.value);
     const year = new Date().getFullYear();
+
     grid.innerHTML = '';
 
+    // Day headers
     const dayHeaders = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
     dayHeaders.forEach(day => {
-        const dayElement = document.createElement('div');
-        dayElement.className = 'calendar-day header';
-        dayElement.textContent = day;
-        grid.appendChild(dayElement);
+        const dayEl = document.createElement('div');
+        dayEl.className = 'calendar-day header';
+        dayEl.textContent = day;
+        grid.appendChild(dayEl);
     });
 
     const firstDay = new Date(year, selectedMonth, 1).getDay();
     const daysInMonth = new Date(year, selectedMonth + 1, 0).getDate();
-    for(let i=0;i<firstDay;i++) grid.appendChild(document.createElement('div')).className='calendar-day';
 
-    // Normalize attendance data keys
-    const attendanceMap = {};
-    for(const key in data.attendance_by_date){
-        const normalizedKey = normalizeDateKey(key);
-        attendanceMap[normalizedKey] = data.attendance_by_date[key];
+    // Empty cells before first day
+    for (let i = 0; i < firstDay; i++) {
+        const emptyEl = document.createElement('div');
+        emptyEl.className = 'calendar-day';
+        emptyEl.innerHTML = '&nbsp;';
+        grid.appendChild(emptyEl);
     }
 
     for(let day=1; day<=daysInMonth; day++){
-        const dayElement = document.createElement('div');
-        dayElement.className='calendar-day';
-        dayElement.textContent = day;
+        const dayEl = document.createElement('div');
+        dayEl.className='calendar-day';
+        dayEl.textContent=day;
 
-        const dateKey = `${year}-${String(selectedMonth + 1).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
-        const status = attendanceMap[dateKey];
-        if(status !== undefined) dayElement.classList.add(status == 1 ? 'present' : 'absent');
+        const dateKey = `${year}-${String(selectedMonth+1).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
 
+        // Mark present/absent
+        if(attendance_by_date?.[dateKey] !== undefined){
+            dayEl.classList.add(attendance_by_date[dateKey] === 1 ? 'present' : 'absent');
+        }
+
+        // Highlight today
         const today = new Date();
-        if(selectedMonth === today.getMonth() && day === today.getDate()) dayElement.classList.add('today');
+        if(selectedMonth === today.getMonth() && day === today.getDate()){
+            dayEl.classList.add('today');
+        }
 
-        grid.appendChild(dayElement);
+        grid.appendChild(dayEl);
     }
 }
 
-// Helper to normalize any date string to YYYY-MM-DD
-function normalizeDateKey(dateString){
-    const d = new Date(dateString);
-    const y = d.getFullYear();
-    const m = String(d.getMonth()+1).padStart(2,'0');
-    const day = String(d.getDate()).padStart(2,'0');
-    return `${y}-${m}-${day}`;
-}
-
-document.addEventListener("DOMContentLoaded",()=>{
+document.addEventListener("DOMContentLoaded", ()=>{
     populateMonthSelector();
     fetchAttendanceData();
-    document.getElementById('monthSelector').addEventListener('change',()=>generateCalendar(attendanceData));
 });
 </script>
 
