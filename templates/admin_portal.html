@@ -55,7 +55,24 @@
       justify-content: center;
       margin-bottom: 20px;
     }
+.student-details {
+    text-align: center;       /* Center the content */
+    font-weight: bold;        /* Make all text bold */
+    margin: 20px auto;        /* Add spacing above and below */
+  }
 
+  .student-details ul {
+    list-style-type: none;    /* Remove bullets */
+    padding: 0;               /* Remove default padding */
+  }
+
+  .student-details li {
+    margin: 5px 0;            /* Small spacing between items */
+  }
+
+  .student-details h3 {
+    margin-bottom: 15px;      /* Space between heading and list */
+  }
     .student-select select {
       padding: 10px;
       font-size: 16px;
@@ -189,18 +206,33 @@
   </div>
 
   {% if student %}
-    <h3>Attendance Calendar - {{ student.name }}</h3>
+  <!-- Student Details -->
+  <div class="student-details">
+    <h3>Student Details</h3>
+    <ul>
+      <li><strong>Name:</strong> {{ student.name }}</li>
+      <li><strong>Email:</strong> {{ student.email }}</li>
+      <li><strong>Height:</strong> {{ student.height }} cm</li>
+      <li><strong>Weight:</strong> {{ student.weight }} kg</li>
+      <li><strong>Age:</strong> {{ student.age }}</li>
+      <li><strong>Gender:</strong> {{ student.gender }}</li>
+      <!-- Add any other fields saved at sign-up -->
+    </ul>
+  </div>
 
-    <div class="calendar-header">
-      <button id="prevMonth">&lt;</button>
-      <span id="monthYear"></span>
-      <button id="nextMonth">&gt;</button>
-    </div>
+  <h3>Attendance Calendar - {{ student.name }}</h3>
 
-    <div id="calendar" data-student-id="{{ student.id }}"></div>
+  <div class="calendar-header">
+    <button id="prevMonth">&lt;</button>
+    <span id="monthYear"></span>
+    <button id="nextMonth">&gt;</button>
+  </div>
 
-    <button id="saveAttendanceBtn">💾 Save Attendance</button>
-  {% endif %}
+  <div id="calendar" data-student-id="{{ student.id }}"></div>
+
+  <button id="saveAttendanceBtn">💾 Save Attendance</button>
+{% endif %}
+
 
   <footer>
     &copy; {{ year|default:2025 }} Yoga Attendance System. All rights reserved.

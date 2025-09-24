@@ -90,6 +90,8 @@ def logins(request):
 
 def about(request):
     return render(request, "about.html")
+def schedule(request):
+    return render(request, "schedule.html")
 
 
 def contact(request):

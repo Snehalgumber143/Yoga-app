@@ -143,138 +143,54 @@ body {font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background:li
 </div>
 
 <script>
-let attendanceData = null;
+let selectedYear = new Date().getFullYear();
+let selectedMonth = new Date().getMonth();
+let attendanceChart = null;
+let pieChart = null;
 
 function populateMonthSelector() {
     const monthSelector = document.getElementById("monthSelector");
     const months = ["January","February","March","April","May","June","July","August","September","October","November","December"];
-    const currentYear = new Date().getFullYear();
-    const currentMonth = new Date().getMonth();
     monthSelector.innerHTML = "";
-    months.forEach((month,index)=>{
+
+    months.forEach((month, index) => {
         const option = document.createElement("option");
         option.value = index;
-        option.textContent = `${month} ${currentYear}`;
-        if(index===currentMonth) option.selected=true;
+        option.textContent = `${month} ${selectedYear}`;
+        if (index === selectedMonth) option.selected = true;
         monthSelector.appendChild(option);
     });
-}
 
-async function saveAttendance() {
-    const studentId = document.getElementById('calendarGrid').dataset.studentId;
-    const attendanceData = [];
-
-    document.querySelectorAll('#calendarGrid .calendar-day').forEach(dayEl => {
-        const day = dayEl.textContent;
-        const month = parseInt(document.getElementById('monthSelector').value);
-        const year = new Date().getFullYear();
-        const dateStr = `${year}-${String(month+1).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
-
-        if(dayEl.classList.contains('present') || dayEl.classList.contains('absent')) {
-            attendanceData.push({
-                student_id: studentId,
-                date: dateStr,
-                status: dayEl.classList.contains('present') ? 'present' : 'absent',
-                class_type: 'Yoga',
-                instructor: 'Palak'
-            });
-        }
-    });
-
-    try {
-        const res = await fetch('/save-attendance/', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRFToken': '{{ csrf_token }}'
-            },
-            body: JSON.stringify({ attendance_data: attendanceData })
-        });
-
-        const data = await res.json();
-        if(data.success) alert('Attendance saved!');
-        else alert('Error: ' + (data.error || 'Unknown'));
-    } catch(err) {
-        console.error(err);
-        alert('Save failed');
-    }
-}
-
-function initCharts(data){
-    const ctx1=document.getElementById('attendanceChart').getContext('2d');
-    new Chart(ctx1,{
-        type:'line',
-        data:{
-            labels:['Jan','Feb','Mar','Apr','May','Jun'],
-            datasets:[{
-                label:'Days Present',
-                data:data.monthly,
-                borderColor:'#2d5a27',
-                backgroundColor:'rgba(45,90,39,0.1)',
-                borderWidth:3,
-                fill:true,
-                tension:0.4
-            }]
-        },
-        options:{
-            responsive:true,
-            plugins:{legend:{display:false}},
-            scales:{y:{beginAtZero:true,max:30}}
-        }
-    });
-
-    const ctx2=document.getElementById('pieChart').getContext('2d');
-    new Chart(ctx2,{
-        type:'doughnut',
-        data:{
-            labels:['Present','Absent'],
-            datasets:[{
-                data:[data.present_days,data.absent_days],
-                backgroundColor:['#2d5a27','#ff6b6b'],
-                borderWidth:0
-            }]
-        },
-        options:{
-            responsive:true,
-            plugins:{legend:{position:'bottom'}}
-        }
+    monthSelector.addEventListener('change', () => {
+        selectedMonth = parseInt(monthSelector.value);
+        refreshAttendance();
     });
 }
+
 async function refreshAttendance() {
     try {
-        const response = await fetch("/api/attendance-data/");
+        const response = await fetch(`/api/attendance-data/?year=${selectedYear}&month=${selectedMonth + 1}`);
         const data = await response.json();
         if (data.error) return;
 
-        // Update stats
         document.getElementById("totalDays").textContent = data.total_days;
         document.getElementById("presentDays").textContent = data.present_days;
         document.getElementById("absentDays").textContent = data.absent_days;
         document.getElementById("attendanceRate").textContent = data.attendance_rate + "%";
 
-        // Update calendar
         const attendance_by_date = data.attendance_by_date || {};
-        generateCalendar(data, attendance_by_date);
-        // Update charts
-        initCharts(data);
-
+        generateCalendar(attendance_by_date);
+        updateCharts(data);
 
     } catch (err) {
         console.error("Error refreshing attendance:", err);
     }
 }
 
-// Call every 30 seconds
-setInterval(refreshAttendance, 1000);
-function generateCalendar(data, attendance_by_date) {
+function generateCalendar(attendance_by_date) {
     const grid = document.getElementById('calendarGrid');
-    const monthSelector = document.getElementById('monthSelector');
-    const selectedMonth = parseInt(monthSelector.value);
-    const year = new Date().getFullYear();
-
     grid.innerHTML = '';
 
-    // Day headers
     const dayHeaders = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
     dayHeaders.forEach(day => {
         const dayEl = document.createElement('div');
@@ -283,10 +199,9 @@ function generateCalendar(data, attendance_by_date) {
         grid.appendChild(dayEl);
     });
 
-    const firstDay = new Date(year, selectedMonth, 1).getDay();
-    const daysInMonth = new Date(year, selectedMonth + 1, 0).getDate();
+    const firstDay = new Date(selectedYear, selectedMonth, 1).getDay();
+    const daysInMonth = new Date(selectedYear, selectedMonth + 1, 0).getDate();
 
-    // Empty cells before first day
     for (let i = 0; i < firstDay; i++) {
         const emptyEl = document.createElement('div');
         emptyEl.className = 'calendar-day';
@@ -294,21 +209,19 @@ function generateCalendar(data, attendance_by_date) {
         grid.appendChild(emptyEl);
     }
 
-    for(let day=1; day<=daysInMonth; day++){
+    for (let day = 1; day <= daysInMonth; day++) {
         const dayEl = document.createElement('div');
-        dayEl.className='calendar-day';
-        dayEl.textContent=day;
+        dayEl.className = 'calendar-day';
+        dayEl.textContent = day;
 
-        const dateKey = `${year}-${String(selectedMonth+1).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
+        const dateKey = `${selectedYear}-${String(selectedMonth + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
 
-        // Mark present/absent
-        if(attendance_by_date?.[dateKey] !== undefined){
+        if (attendance_by_date?.[dateKey] !== undefined) {
             dayEl.classList.add(attendance_by_date[dateKey] === 1 ? 'present' : 'absent');
         }
 
-        // Highlight today
         const today = new Date();
-        if(selectedMonth === today.getMonth() && day === today.getDate()){
+        if (selectedYear === today.getFullYear() && selectedMonth === today.getMonth() && day === today.getDate()) {
             dayEl.classList.add('today');
         }
 
@@ -316,11 +229,61 @@ function generateCalendar(data, attendance_by_date) {
     }
 }
 
-document.addEventListener("DOMContentLoaded", ()=>{
+function updateCharts(data) {
+    const ctxLine = document.getElementById('attendanceChart').getContext('2d');
+    const ctxPie = document.getElementById('pieChart').getContext('2d');
+
+    // Destroy old charts if they exist
+    if (attendanceChart) attendanceChart.destroy();
+    if (pieChart) pieChart.destroy();
+
+    attendanceChart = new Chart(ctxLine, {
+        type: 'line',
+        data: {
+            labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+            datasets: [{
+                label: 'Days Present',
+                data: data.monthly, // Should be an array of length 12
+                borderColor: '#2d5a27',
+                backgroundColor: 'rgba(45,90,39,0.1)',
+                borderWidth: 3,
+                fill: true,
+                tension: 0.4
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: { legend: { display: false } },
+            scales: { y: { beginAtZero: true, max: 30 } }
+        }
+    });
+
+    pieChart = new Chart(ctxPie, {
+        type: 'doughnut',
+        data: {
+            labels: ['Present', 'Absent'],
+            datasets: [{
+                data: [data.present_days, data.absent_days],
+                backgroundColor: ['#2d5a27', '#ff6b6b'],
+                borderWidth: 0
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: { legend: { position: 'bottom' } }
+        }
+    });
+}
+
+document.addEventListener("DOMContentLoaded", () => {
     populateMonthSelector();
-    fetchAttendanceData();
+    refreshAttendance();
 });
+
+// Optional: Refresh every 30 seconds
+setInterval(refreshAttendance, 30000);
 </script>
+
 
 </body>
 </html>

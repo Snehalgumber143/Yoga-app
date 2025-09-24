@@ -13,7 +13,7 @@ urlpatterns = [
          ), 
          name="instructor_login"),
     path("services",views.services,name='services'),
-    path("api/attendance-data/", views.attendance_data_api, name="attendance_data"),
+    path("api/attendance-data/", views.attendance_data_api, name="attendance_data_api"),
     path("contact",views.contact,name='contact'),
     path("video",views.video,name='video'),
     path('admin-portal/', views.admin_portal, name='admin_portal'),
@@ -23,6 +23,7 @@ urlpatterns = [
     path('delete-attendance/<int:id>/', views.delete_attendance, name='delete_attendance'),
     path('get-students/', views.get_students, name='get_students'),
     path('signup/', views.signup, name='signup'),
+    path("schedule/",views.schedule,name='schedule'),
     path('get-logged-in-students/', views.get_logged_in_students, name='get_logged_in_students'),
     path('export-attendance/', views.export_attendance, name='export_attendance')
 ]

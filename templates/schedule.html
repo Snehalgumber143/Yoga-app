@@ -1,0 +1,406 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Yoga Classes & Schedule</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    body {
+      background: #f9fafb;
+      font-family: 'Segoe UI', sans-serif;
+    }
+    .navbar {
+      border-radius: 0 0 1rem 1rem;
+    }
+    .navbar-brand {
+      font-size: 1.4rem;
+      letter-spacing: 1px;
+    }
+    .card {
+      border: none;
+      border-radius: 1rem;
+      transition: all 0.3s ease;
+    }
+    .card:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+    }
+    .card-title {
+      font-size: 1.2rem;
+    }
+    .badge {
+      border-radius: 1rem;
+      padding: 0.4rem 0.7rem;
+      font-size: 0.75rem;
+    }
+    table {
+      border-radius: 1rem;
+      overflow: hidden;
+    }
+    thead {
+      font-size: 0.9rem;
+    }
+    tbody td {
+      font-size: 0.85rem;
+      padding: 0.75rem;
+    }
+    .table-warning {
+      font-weight: 600;
+      background-color: #fff3cd !important;
+    }
+  </style>
+</head>
+<body>
+
+<!-- Navbar -->
+<nav class="navbar navbar-expand-lg bg-white shadow-sm">
+  <div class="container">
+    <a class="navbar-brand text-success fw-bold" href="#">ZenGlow</a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav ms-auto">
+        <li class="nav-item"><a class="nav-link" href="{% url 'home' %}">Home</a></li>
+        <li class="nav-item"><a class="nav-link" href="{% url 'about' %}">About</a></li>
+        <li class="nav-item"><a class="nav-link active text-success fw-semibold" href="{% url 'schedule' %}">Schedule</a></li>
+        <li class="nav-item"><a class="nav-link" href="{% url 'contact' %}">Contact</a></li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<!-- Hero with Background Image -->
+<section class="hero text-center my-0 container-fluid d-flex align-items-center justify-content-center"
+         style="background-image: url('{% static "hello/images/dave-contreras-R1PUDOAhb5Q-unsplash.jpg" %}');
+                background-position: center;
+                background-size: cover;
+                background-margin: 0;
+                background-repeat: no-repeat;
+                min-height: 70vh; 
+                border-radius: 1rem;
+                position: relative;">
+
+  <!-- Overlay for softness -->
+  <div style="background: rgba(255,255,255,0.7); padding: 3rem; border-radius: 1rem; max-width: 700px;">
+    <h2 class="fw-bold mb-3 text-success">Find Your Flow 🌸</h2>
+    <p class="text-muted">
+      Explore our curated yoga classes designed to nurture balance, strength, and relaxation.  
+      Join our monthly schedule to experience harmony for body and mind.
+    </p>
+    <a href="#schedule" class="btn btn-success px-4 py-2 mt-3 shadow">View Schedule</a>
+  </div>
+</section>
+
+
+
+
+
+<!-- Cards Grid -->
+<section class="py-5">
+  <div class="container">
+    <div class="row g-5"> <!-- increased gap between cards -->
+
+      <div class="col-md-4">
+        <div class="card shadow-lg h-100">
+          <div class="card-body p-4"> <!-- increased padding -->
+            <h5 class="card-title text-success fs-4 fw-bold">Core Yoga</h5> <!-- bigger title -->
+            <p class="card-text text-muted fs-6">
+              Build core strength, stability, and posture with a grounding practice.
+            </p>
+            <span class="badge bg-success-subtle text-success border py-2 px-3 fs-6">Strength & Stability</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-4">
+        <div class="card shadow-lg h-100">
+          <div class="card-body p-4">
+            <h5 class="card-title text-danger fs-4 fw-bold">Calorie Crusher</h5>
+            <p class="card-text text-muted fs-6">
+              A fiery, high-energy flow that boosts stamina and endurance.
+            </p>
+            <span class="badge bg-danger-subtle text-danger border py-2 px-3 fs-6">Endurance & Cardio</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-4">
+        <div class="card shadow-lg h-100">
+          <div class="card-body p-4">
+            <h5 class="card-title text-primary fs-4 fw-bold">Chandra Namaskar</h5>
+            <p class="card-text text-muted fs-6">
+              A soothing moon sequence to restore energy and relieve stress.
+            </p>
+            <span class="badge bg-primary-subtle text-primary border py-2 px-3 fs-6">Calm & Relaxation</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-4">
+        <div class="card shadow-lg h-100">
+          <div class="card-body p-4">
+            <h5 class="card-title text-warning fs-4 fw-bold">Prithvi Namaskar</h5>
+            <p class="card-text text-muted fs-6">
+              Grounding and stabilizing sequence to enhance balance and stability.
+            </p>
+            <span class="badge bg-warning-subtle text-warning border py-2 px-3 fs-6">Balance & Stability</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-4">
+        <div class="card shadow-lg h-100">
+          <div class="card-body p-4">
+            <h5 class="card-title text-info fs-4 fw-bold">Deep Stretching</h5>
+            <p class="card-text text-muted fs-6">
+              Improves flexibility, releases tension, and enhances mobility.
+            </p>
+            <span class="badge bg-info-subtle text-info border py-2 px-3 fs-6">Recovery & Flexibility</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-4">
+        <div class="card shadow-lg h-100">
+          <div class="card-body p-4">
+            <h5 class="card-title text-secondary fs-4 fw-bold">Warrior Flow</h5>
+            <p class="card-text text-muted fs-6">
+              Builds strength, balance, alignment, and endurance through Warrior postures.
+            </p>
+            <span class="badge bg-secondary-subtle text-secondary border py-2 px-3 fs-6">Core Strength & Endurance</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-4">
+        <div class="card shadow-lg h-100">
+          <div class="card-body p-4">
+            <h5 class="card-title text-dark fs-4 fw-bold">Ashtanga Vinyasa</h5>
+            <p class="card-text text-muted fs-6">
+              Traditional sequence improving flexibility, strength, stamina, and breath control.
+            </p>
+            <span class="badge bg-dark-subtle text-dark border py-2 px-3 fs-6">Stamina & Flexibility</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-4">
+        <div class="card shadow-lg h-100">
+          <div class="card-body p-4">
+            <h5 class="card-title text-success fs-4 fw-bold">Hatha Yoga</h5>
+            <p class="card-text text-muted fs-6">
+              Emphasizes alignment, breathwork, and mindfulness.
+            </p>
+            <span class="badge bg-success-subtle text-success border py-2 px-3 fs-6">Mental Strength & Mindfulness</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-4">
+        <div class="card shadow-lg h-100">
+          <div class="card-body p-4">
+            <h5 class="card-title text-danger fs-4 fw-bold">Dumble Yoga</h5>
+            <p class="card-text text-muted fs-6">
+              Light weights enhance strength while maintaining yoga alignment.
+            </p>
+            <span class="badge bg-danger-subtle text-danger border py-2 px-3 fs-6">Muscle Tone & Endurance</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-4">
+        <div class="card shadow-lg h-100">
+          <div class="card-body p-4">
+            <h5 class="card-title text-primary fs-4 fw-bold">Tibetan Flow</h5>
+            <p class="card-text text-muted fs-6">
+              Enhances vitality, balance, and promotes youthfulness.
+            </p>
+            <span class="badge bg-primary-subtle text-primary border py-2 px-3 fs-6">Youthfulness & Vitality</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-4">
+        <div class="card shadow-lg h-100">
+          <div class="card-body p-4">
+            <h5 class="card-title text-warning fs-4 fw-bold">Yoga Nidra</h5>
+            <p class="card-text text-muted fs-6">
+              Guided yogic sleep practice for deep relaxation and stress relief.
+            </p>
+            <span class="badge bg-warning-subtle text-warning border py-2 px-3 fs-6">Stress Relief & Relaxation</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+<section id="schedule" class="py-5" style="background: #f7f9fa;">
+  <div class="container">
+    <h3 class="fw-bold mb-4 text-center text-success display-5">🌿 Monthly Yoga Schedule</h3>
+    <p class="text-muted text-center fs-4">Sessions: Mon, Wed, Fri · 45–50 min each</p>
+    
+    <div class="row">
+      <div class="col-md-10 mx-auto">
+        <table class="table text-center shadow-lg" style="border-radius: 1rem; overflow: hidden; background: #fff; font-size: 1.25rem;">
+          <thead>
+            <tr style="background: linear-gradient(90deg, #a8e6cf, #dcedc1); color: #333; font-size: 1.3rem;">
+              <th class="py-4">Week</th>
+              <th class="py-4">Day</th>
+              <th class="py-4">Class</th>
+              <th class="py-4">Focus / Theme</th>
+            </tr>
+          </thead>
+          <tbody>
+            <!-- Week 1 -->
+            <tr class="week-row" style="background: #e0f7fa;">
+              <td rowspan="3"><span class="badge bg-success fs-5 py-2 px-4">Week 1</span></td>
+              <td>Mon 🗓️</td>
+              <td>Core Yoga 🧘‍♂️</td>
+              <td>Strength & Stability</td>
+            </tr>
+            <tr class="week-row" style="background: #b2ebf2;">
+              <td>Wed 🗓️</td>
+              <td>Calorie Crusher 🔥</td>
+              <td>High-Energy Flow, Endurance & Cardio</td>
+            </tr>
+            <tr class="week-row" style="background: #e0f7fa;">
+              <td>Fri 🗓️</td>
+              <td>Chandra Namaskar 🌙</td>
+              <td>Moon Salutation – Calm & Relaxation</td>
+            </tr>
+
+            <!-- Week 2 -->
+            <tr class="week-row" style="background: #fff3e0;">
+              <td rowspan="3"><span class="badge bg-warning fs-5 py-2 px-4">Week 2</span></td>
+              <td>Mon 🗓️</td>
+              <td>Prithvi Namaskar 🌍</td>
+              <td>Grounding & Stability</td>
+            </tr>
+            <tr class="week-row" style="background: #ffe0b2;">
+              <td>Wed 🗓️</td>
+              <td>Deep Stretching 🤸‍♀️</td>
+              <td>Flexibility & Muscle Recovery</td>
+            </tr>
+            <tr class="week-row" style="background: #fff3e0;">
+              <td>Fri 🗓️</td>
+              <td>Warrior Flow 🗡️</td>
+              <td>Strength, Balance & Alignment</td>
+            </tr>
+
+            <!-- Week 3 -->
+            <tr class="week-row" style="background: #e3f2fd;">
+              <td rowspan="3"><span class="badge bg-primary fs-5 py-2 px-4">Week 3</span></td>
+              <td>Mon 🗓️</td>
+              <td>Ashtanga Vinyasa 🔄</td>
+              <td>Structured Flow, Strength & Flexibility</td>
+            </tr>
+            <tr class="week-row" style="background: #bbdefb;">
+              <td>Wed 🗓️</td>
+              <td>Hatha Yoga 🌿</td>
+              <td>Breathwork, Alignment & Mindfulness</td>
+            </tr>
+            <tr class="week-row" style="background: #e3f2fd;">
+              <td>Fri 🗓️</td>
+              <td>Dumble Yoga 🏋️‍♀️</td>
+              <td>Strength Training with Dumbbells</td>
+            </tr>
+
+            <!-- Week 4 -->
+            <tr class="week-row" style="background: #fce4ec;">
+              <td rowspan="3"><span class="badge bg-danger fs-5 py-2 px-4">Week 4</span></td>
+              <td>Mon 🗓️</td>
+              <td>Back Bending Flow 🌈</td>
+              <td>Heart Opening, Energy & Lung Capacity</td>
+            </tr>
+            <tr class="week-row" style="background: #f8bbd0;">
+              <td>Wed 🗓️</td>
+              <td>Forward Bending Flow ↩️</td>
+              <td>Spine Stretch, Calmness & Introspection</td>
+            </tr>
+            <tr class="week-row" style="background: #fce4ec;">
+              <td>Fri 🗓️</td>
+              <td>Tibetan Flow 🕉️</td>
+              <td>Rejuvenation, Vitality & Chakra Balance</td>
+            </tr>
+
+            <!-- Bonus -->
+            <tr style="background: #fff3cd; font-weight: 700; font-size: 1.2rem;">
+              <td colspan="4">🛌 Bonus Session — Once a Month: Yoga Nidra (Last Saturday) | Deep Relaxation, Stress Relief & Mind Restoration</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <style>
+    /* Hover animation */
+    .week-row:hover {
+      transform: scale(1.03);
+      transition: transform 0.2s ease-in-out;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+    }
+    table th, table td {
+      vertical-align: middle;
+    }
+    table td, table th {
+      padding: 1.25rem 0.75rem;
+    }
+  </style>
+</section>
+<!-- Footer -->
+<footer class="bg-success text-white pt-5 pb-4 mt-5">
+  <div class="container text-center text-md-left">
+    <div class="row">
+
+      <!-- About -->
+      <div class="col-md-4 col-lg-4 col-xl-4 mx-auto mt-3">
+        <h5 class="text-uppercase mb-4 font-weight-bold">🌿 Yoga Studio</h5>
+        <p>
+          Empowering your mind and body with curated yoga sessions. 
+          Join us for strength, balance, and relaxation. 
+          Find your flow and embrace wellness.
+        </p>
+      </div>
+
+      
+      <!-- Contact Info -->
+      <div class="col-md-5 col-lg-5 col-xl-5 mx-auto mt-3">
+        <h5 class="text-uppercase mb-4 font-weight-bold">Contact</h5>
+        <p><i class="bi bi-geo-alt-fill me-2"></i>123 Yoga Street, Wellness City</p>
+        <p><i class="bi bi-envelope-fill me-2"></i>info@yogastudio.com</p>
+        <p><i class="bi bi-telephone-fill me-2"></i>+1 234 567 890</p>
+      </div>
+
+    </div>
+
+    <hr class="mb-4">
+    
+    <div class="row align-items-center">
+      <div class="col-md-7 col-lg-8">
+        <p class="text-white mb-0">
+          &copy; 2025 Yoga Studio. All Rights Reserved.
+        </p>
+      </div>
+      <div class="col-md-5 col-lg-4 text-center text-md-right">
+        <a href="#" class="text-white me-3"><i class="bi bi-facebook"></i></a>
+        <a href="#" class="text-white me-3"><i class="bi bi-instagram"></i></a>
+        <a href="#" class="text-white me-3"><i class="bi bi-twitter"></i></a>
+        <a href="#" class="text-white"><i class="bi bi-youtube"></i></a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<!-- Bootstrap Icons (for social links) -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+
+
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
