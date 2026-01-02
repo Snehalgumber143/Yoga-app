@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ZenFlow Yoga Studio</title>
+<title>Yog YogDhara Yoga Studio</title>
 <script src="https://cdn.tailwindcss.com/3.4.16"></script>
 <script>
 tailwind.config = {
@@ -96,16 +96,25 @@ body {
 <body>
 <header class="bg-white shadow-sm fixed w-full top-0 z-50">
   <nav class="container mx-auto px-6 py-4 flex items-center justify-between">
-    <h1 class="font-['Pacifico'] text-3xl text-primary">ZenFlow</h1>
+    <h1 class="font-['Pacifico'] text-3xl text-primary">YogDhara</h1>
     <div class="hidden md:flex items-center space-x-8">
       <a href="{% url 'home' %}" class="nav-link text-gray-700 hover:text-primary transition-colors">Home</a>
       <a href="{% url 'services' %}" class="nav-link text-gray-700 hover:text-primary transition-colors" href="/services">Attendance</a>
       <a href="{% url 'about' %}" class="nav-link text-gray-700 hover:text-primary transition-colors" >About</a>
       <a href="{% url 'contact' %}" class="nav-link text-gray-700 hover:text-primary transition-colors" href="/contact">Contact</a>
-      <button 
-       class="bg-accent text-white px-6 py-2 !rounded-button shadow hover:bg-accent/90 transition-all whitespace-nowrap">
-        Get Started
-      </button>
+{% if student %}
+<button id="profileBtn"
+  class="bg-accent text-white px-6 py-2 rounded-button shadow">
+  {{ student.name }}
+</button>
+{% else %}
+<a href="{% url 'logins' %}"
+  class="bg-accent text-white px-6 py-2 rounded-button shadow">
+  Get Started
+</a>
+{% endif %}
+
+
    
     </div>
     <button class="md:hidden w-10 h-10 flex items-center justify-center">
@@ -254,6 +263,121 @@ body {
     </div>
   </div>
 </footer>
+{% if student %}
+<div id="profileModal"
+ class="fixed inset-0 hidden bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center">
+
+  <div
+   class="bg-white rounded-3xl w-[90%] md:w-[60%] lg:w-[35%]
+          p-10 shadow-2xl animate-slideUp relative">
+
+    <!-- Close -->
+    <button id="closeProfile"
+      class="absolute top-5 right-5 text-gray-400 hover:text-black text-2xl">
+      <i class="ri-close-line"></i>
+    </button>
+
+    <!-- Avatar -->
+    <div class="flex justify-center mb-6">
+      <div
+       class="w-24 h-24 rounded-full bg-primary/10 flex items-center justify-center
+              text-primary text-4xl font-semibold shadow-inner">
+        {{ student.name|slice:":1" }}
+      </div>
+    </div>
+
+    <!-- Name -->
+    <h2 class="text-center text-2xl font-semibold text-gray-800">
+      {{ student.name }}
+    </h2>
+
+    <p class="text-center text-gray-500 mb-8">
+      Yoga Studio Member
+    </p>
+
+    <!-- Info grid -->
+   <!-- Stats grid -->
+<div class="grid grid-cols-2 gap-6 text-gray-700 text-base">
+
+  <div class="bg-gray-50 p-4 rounded-xl">
+    <p class="text-sm text-gray-500">Age</p>
+    <p class="font-semibold">{{ student.age }} years</p>
+  </div>
+
+  <div class="bg-gray-50 p-4 rounded-xl">
+    <p class="text-sm text-gray-500">Gender</p>
+    <p class="font-semibold">{{ student.gender }}</p>
+  </div>
+
+  <div class="bg-gray-50 p-4 rounded-xl">
+    <p class="text-sm text-gray-500">Height</p>
+    <p class="font-semibold">{{ student.height }} cm</p>
+  </div>
+
+  <div class="bg-gray-50 p-4 rounded-xl">
+    <p class="text-sm text-gray-500">Weight</p>
+    <p class="font-semibold">{{ student.weight }} kg</p>
+  </div>
+
+  <!-- Months Enrolled -->
+  <div class="bg-primary/10 p-4 rounded-xl col-span-2">
+    <p class="text-sm text-primary">Membership Duration</p>
+    <p class="text-xl font-bold text-primary">
+      {{ student.months_enrolled }} months
+    </p>
+  </div>
+
+  <!-- BMI -->
+  <div class="bg-accent/10 p-4 rounded-xl col-span-2">
+    <p class="text-sm text-gray-600">Body Mass Index</p>
+    <p class="text-xl font-bold">
+      {{ student.bmi }}
+      <span class="text-sm text-gray-500">
+        ({{ student.bmi_category }})
+      </span>
+    </p>
+  </div>
+
+</div>
+
+
+    <!-- Divider -->
+    <div class="border-t my-8"></div>
+
+    <!-- Actions -->
+    <div class="flex justify-between items-center text-base">
+
+      <a href="{% url 'services' %}"
+       class="text-primary font-semibold hover:underline">
+        View Attendance
+      </a>
+
+      <a href="{% url 'logout' %}"
+       class="text-red-500 hover:text-red-600 font-semibold">
+        Logout
+      </a>
+
+    </div>
+
+  </div>
+</div>
+{% endif %}
+
+<script>
+const profileBtn = document.getElementById("profileBtn");
+const profileModal = document.getElementById("profileModal");
+const closeProfile = document.getElementById("closeProfile");
+
+if (profileBtn) {
+  profileBtn.onclick = () => profileModal.classList.remove("hidden");
+}
+
+if (closeProfile) {
+  closeProfile.onclick = () => profileModal.classList.add("hidden");
+}
+</script>
+
+
 
 </body>
 </html>

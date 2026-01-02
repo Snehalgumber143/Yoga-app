@@ -11,19 +11,53 @@ from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib import messages
 from django.db.models import Count, Q
 from django.db.models.functions import ExtractMonth
-from home.models import Student, Attendance, Contact
+from home.models import Student, Attendance, Contact,LegacyRecord
+from django.shortcuts import redirect
+from django.db.models import Sum
+from django.contrib.auth import logout
+
 
 
 def index(request):
-    student_name = request.session.get('student_name', 'Guest')
-    context = {"variable": student_name}
+    student = None
+
+    student_id = request.session.get('student_id')
+    if student_id:
+        try:
+            student = Student.objects.using('mysql_db').get(id=student_id)
+        except Student.DoesNotExist:
+            # session is stale → clean it
+            request.session.flush()
+            student = None
+
+    context = {
+        "student": student,
+        "variable": student.name if student else "Guest"
+    }
+
     return render(request, "index.html", context)
 
+
+INSTRUCTOR_ID = "palak"
+INSTRUCTOR_PASSWORD = "root"
+
+def instructor_login(request):
+    if request.method == "POST":
+        username = request.POST.get("username")
+        password = request.POST.get("password")
+
+        if username == INSTRUCTOR_ID and password == INSTRUCTOR_PASSWORD:
+            request.session["instructor_logged_in"] = True
+            return redirect("admin_portal")
+        else:
+            messages.error(request, "Invalid instructor credentials")
+
+    return render(request, "instructor_login.html")
 
 def signup(request):
     if request.method == 'POST':
         name = request.POST.get('name', '').strip()
-        email = request.POST.get('email', '').strip()
+        email = request.POST.get('email', '').strip().lower()
         password = request.POST.get('password', '')
         gender = request.POST.get('gender', '')
         age = request.POST.get('age')
@@ -42,29 +76,51 @@ def signup(request):
             messages.error(request, "Please enter valid age, height, and weight.")
             return redirect('signup')
 
+        # 🚫 email already used by real account
         if Student.objects.using('mysql_db').filter(email=email).exists():
             messages.error(request, "Email already exists.")
             return redirect('signup')
 
-        try:
-            hashed_password = make_password(password)
-            Student.objects.using('mysql_db').create(
-                name=name,
-                email=email,
-                password=hashed_password,
-                gender=gender,
-                age=age,
-                height=height,
-                weight=weight
+        hashed_password = make_password(password)
+
+        # 🔥 STEP 1: check legacy student (same name, no email)
+        legacy_student = Student.objects.using('mysql_db').filter(
+            name__iexact=name,
+            email__isnull=True,
+            legacy_key__isnull=False
+        ).first()
+
+        if legacy_student:
+            # ✅ attach login details to legacy record
+            legacy_student.email = email
+            legacy_student.password = hashed_password
+            legacy_student.gender = gender
+            legacy_student.age = age
+            legacy_student.height = height
+            legacy_student.weight = weight
+            legacy_student.save()
+
+            messages.success(
+                request,
+                "Welcome back! Your previous records have been linked."
             )
-            messages.success(request, "Signup successful!")
             return redirect('logins')
-        except Exception as e:
-            messages.error(request, f"Error saving data: {str(e)}")
-            return redirect('signup')
+
+        # 🆕 STEP 2: new student
+        Student.objects.using('mysql_db').create(
+            name=name,
+            email=email,
+            password=hashed_password,
+            gender=gender,
+            age=age,
+            height=height,
+            weight=weight
+        )
+
+        messages.success(request, "Signup successful!")
+        return redirect('logins')
 
     return render(request, 'signup.html')
-
 
 def logins(request):
     if request.method == 'POST':
@@ -92,19 +148,27 @@ def about(request):
     return render(request, "about.html")
 def schedule(request):
     return render(request, "schedule.html")
-
+def instructor_logout(request):
+    logout(request)   # 🔥 clears session
+    return redirect("logins")
 
 def contact(request):
     if request.method == "POST":
         name = request.POST.get('name')
         email = request.POST.get('email')
         description = request.POST.get('description')
-        contact = Contact(name=name, email=email, description=description, date=datetime.today())
+        contact = Contact(
+            name=name,
+            email=email,
+            description=description,
+            date=datetime.today()
+        )
         contact.save()
-        messages.success(request, "Your feedback is stored; we'll get back to you shortly 😊")
+        messages.success(
+            request,
+            "Your feedback is stored; we'll get back to you shortly 😊"
+        )
     return render(request, "contact.html")
-
-
 def services(request):
     student_name = request.session.get('student_name', 'Guest')
     student_email = request.session.get('student_email', 'guest@example.com')
@@ -127,41 +191,151 @@ def video(request):
     context = {'room_name': room_name}
     return render(request, "meet.html", context)
 
-
-@login_required
-@user_passes_test(lambda u: u.is_staff)
+def instructor_required(view_func):
+    def wrapper(request, *args, **kwargs):
+        if not request.session.get("instructor_logged_in"):
+            if request.headers.get("x-requested-with") == "XMLHttpRequest":
+                return JsonResponse(
+                    {"success": False, "error": "Unauthorized"},
+                    status=401
+                )
+            return redirect("instructor_login")
+        return view_func(request, *args, **kwargs)
+    return wrapper
+@instructor_required
 def admin_portal(request):
     students = Student.objects.using('mysql_db').all()
+    feedbacks = Contact.objects.all().order_by('-date')
+
+    # ✅ GLOBAL DASHBOARD STATS
+    total_students = students.count()
+
+    total_attendance_sessions = Attendance.objects.using(
+        'mysql_db'
+    ).filter(is_present=True).count()
+
+    total_legacy_amount = (
+        LegacyRecord.objects.using('mysql_db')
+        .aggregate(Sum("total_amount"))["total_amount__sum"]
+        or 0
+    )
+
+    total_attendance_amount = (
+        Attendance.objects.using('mysql_db')
+        .aggregate(Sum("fee"))["fee__sum"]
+        or 0
+    )
+
+    total_revenue = total_legacy_amount + total_attendance_amount
+
     student_id = request.GET.get('student_id')
     student = None
-    attendance_map = {}
     attendance_records = []
+    attendance_map = {}
+
+    legacy_sessions = 0
+    legacy_amount = 0
+
+    present_count = 0
+    total_fee = 0
+    total_sessions = 0
+    total_paid = 0
+    fee_status = "N/A"
 
     if student_id:
-        student = get_object_or_404(Student.objects.using('mysql_db'), id=student_id)
-        attendance_records = Attendance.objects.using('mysql_db').filter(student=student)
+        student = get_object_or_404(
+            Student.objects.using('mysql_db'),
+            id=student_id
+        )
+
+        attendance_records = Attendance.objects.using('mysql_db').filter(
+            student=student
+        )
+
+        # Attendance stats
+        present_count = attendance_records.filter(
+            is_present=True
+        ).count()
+
+        total_fee = attendance_records.aggregate(
+            total=Sum("fee")
+        )["total"] or 0
+
+        # Legacy data
+        legacy_record = getattr(student, "legacyrecord", None)
+        if legacy_record:
+            legacy_sessions = legacy_record.total_sessions
+            legacy_amount = legacy_record.total_amount
+
+        # Combined stats
+        total_sessions = legacy_sessions + present_count
+        total_paid = legacy_amount + total_fee
+
+        # Fee status (simple logic)
+        if total_paid > 0:
+            fee_status = "Paid"
+        else:
+            fee_status = "Due"
+
+        # Calendar map
         for record in attendance_records:
-            date_str = record.date.strftime('%Y-%m-%d')
-            attendance_map[date_str] = 'present' if record.is_present else 'absent'
+            attendance_map[
+                record.date.strftime('%Y-%m-%d')
+            ] = "present" if record.is_present else "absent"
 
     return render(request, 'admin_portal.html', {
         'students': students,
         'student': student,
         'attendance_map': attendance_map,
-        'attendance_records': attendance_records
+        'attendance_records': attendance_records,
+        'total_students': total_students,
+        'admin_sessions': total_attendance_sessions,
+        'total_revenue': total_revenue,
+
+        # 👇 NEW IMPORTANT DATA
+        'legacy_sessions': legacy_sessions,
+        'legacy_amount': legacy_amount,
+        'present_count': present_count,
+        'total_sessions': total_sessions,
+        'total_paid': total_paid,
+        'fee_status': fee_status,
+        "feedbacks": feedbacks
     })
 
-
 @csrf_exempt
+def save_legacy_record(request):
+    if request.method != "POST":
+        return JsonResponse({"success": False})
+
+    student_id = request.POST.get("student_id")
+    sessions = request.POST.get("sessions", 0)
+    amount = request.POST.get("amount", 0)
+
+    student = get_object_or_404(
+        Student.objects.using('mysql_db'),
+        id=student_id
+    )
+
+    LegacyRecord.objects.using('mysql_db').update_or_create(
+        student=student,
+        defaults={
+            "total_sessions": sessions,
+            "total_amount": amount
+        }
+    )
+
+    return JsonResponse({"success": True})
+
+SESSION_FEE = 500 
+
+@instructor_required
+@csrf_exempt
+ # change if needed
 def save_attendance(request):
-    """
-    Handles both:
-    1. JSON POST requests with multiple attendance entries (API)
-    2. Form POST requests (admin portal)
-    """
     if request.method != "POST":
         return JsonResponse({'success': False, 'error': 'Invalid request method'})
 
+    # ---------- API / JSON ----------
     if request.content_type == "application/json":
         try:
             data = json.loads(request.body)
@@ -176,10 +350,12 @@ def save_attendance(request):
                 status = entry.get('status', 'absent')
 
                 if not student_id or not date_str:
-                    continue  # skip invalid entries
+                    continue
 
                 student = Student.objects.using('mysql_db').get(id=student_id)
                 is_present = status.lower() == 'present'
+
+                fee = SESSION_FEE if is_present else 0
 
                 Attendance.objects.using('mysql_db').update_or_create(
                     student_id=student.id,
@@ -187,18 +363,17 @@ def save_attendance(request):
                     defaults={
                         'class_type': class_type,
                         'instructor': instructor,
-                        'is_present': is_present
+                        'is_present': is_present,
+                        'fee': fee
                     }
                 )
 
                 saved_records.append({
                     'student_id': student.id,
                     'name': student.name,
-                    'email': student.email,
                     'date': date_str,
-                    'is_present': is_present,
-                    'class_type': class_type,
-                    'instructor': instructor,
+                    'status': status,
+                    'fee': fee
                 })
 
             return JsonResponse({'success': True, 'saved_attendance': saved_records})
@@ -206,6 +381,7 @@ def save_attendance(request):
         except Exception as e:
             return JsonResponse({'success': False, 'error': str(e)})
 
+    # ---------- ADMIN FORM ----------
     else:
         try:
             student_id = request.POST.get("student_id")
@@ -217,10 +393,12 @@ def save_attendance(request):
             instructor = request.POST.get("instructor", "Admin")
 
             date_str = request.POST.get("date")
-            if date_str:
-                date_val = datetime.strptime(date_str, "%Y-%m-%d").date()
-            else:
-                date_val = now().date()
+            date_val = (
+                datetime.strptime(date_str, "%Y-%m-%d").date()
+                if date_str else now().date()
+            )
+
+            fee = SESSION_FEE if is_present else 0
 
             Attendance.objects.using('mysql_db').update_or_create(
                 student_id=student_id,
@@ -229,6 +407,7 @@ def save_attendance(request):
                 defaults={
                     "is_present": is_present,
                     "instructor": instructor,
+                    "fee": fee
                 }
             )
 
@@ -238,6 +417,7 @@ def save_attendance(request):
             return JsonResponse({'success': False, 'error': str(e)})
 
 
+@instructor_required
 @csrf_exempt
 def delete_attendance(request, id):
     try:
@@ -248,14 +428,22 @@ def delete_attendance(request, id):
         return JsonResponse({"success": False, "error": str(e)})
 
 
-@login_required
+
 @require_GET
 def attendance_data_api(request):
     student_id = request.session.get('student_id')
-    if not student_id:
-        return JsonResponse({"error": "Student not logged in"}, status=401)
 
-    student = get_object_or_404(Student.objects.using('mysql_db'), id=student_id)
+    if not student_id:
+        return JsonResponse(
+            {"error": "Student not logged in"},
+            status=401
+        )
+
+    student = get_object_or_404(
+        Student.objects.using('mysql_db'),
+        id=student_id
+    )
+
     attendance_records = Attendance.objects.using('mysql_db').filter(student=student)
 
     total_days = attendance_records.count()
@@ -263,30 +451,30 @@ def attendance_data_api(request):
     absent_days = total_days - present_days
     attendance_rate = round((present_days / total_days) * 100, 2) if total_days else 0
 
-    # Build monthly present counts
-    monthly = attendance_records.annotate(month=ExtractMonth('date')).values('month').annotate(
+    monthly = attendance_records.annotate(
+        month=ExtractMonth('date')
+    ).values('month').annotate(
         present_count=Count('id', filter=Q(is_present=True))
     ).order_by('month')
 
-    # Convert to array of 12 months
-    monthly_counts = [0]*12
+    monthly_counts = [0] * 12
     for m in monthly:
-        monthly_counts[m['month']-1] = m['present_count']
+        monthly_counts[m['month'] - 1] = m['present_count']
 
-    # Build attendance_by_date
-    attendance_by_date = {record.date.strftime("%Y-%m-%d"): 1 if record.is_present else 0
-                          for record in attendance_records}
+    attendance_by_date = {
+        record.date.strftime("%Y-%m-%d"): 1 if record.is_present else 0
+        for record in attendance_records
+    }
 
-    data = {
+    return JsonResponse({
         "total_days": total_days,
         "present_days": present_days,
         "absent_days": absent_days,
         "attendance_rate": attendance_rate,
         "attendance_by_date": attendance_by_date,
         "monthly": monthly_counts
-    }
-
-    return JsonResponse(data)
+    })
+@instructor_required
 def export_attendance(request):
     response = HttpResponse(content_type='text/csv')
     response['Content-Disposition'] = 'attachment; filename="attendance.csv"'
@@ -305,6 +493,36 @@ def export_attendance(request):
         ])
 
     return response
+@instructor_required
+def add_legacy_student(request):
+    if request.method == "POST":
+        name = request.POST.get("name").strip()
+        legacy_key = request.POST.get("legacy_key").strip()
+        total_sessions = request.POST.get("total_sessions")
+        total_amount = request.POST.get("total_amount")
+        notes = request.POST.get("notes", "")
+
+        if not all([name, legacy_key, total_sessions, total_amount]):
+            messages.error(request, "All fields are required")
+            return redirect("add_legacy_student")
+
+        # create student without email/password
+        student = Student.objects.using('mysql_db').create(
+            name=name,
+            legacy_key=legacy_key
+        )
+
+        LegacyRecord.objects.using('mysql_db').create(
+            student=student,
+            total_sessions=total_sessions,
+            total_amount=total_amount,
+            notes=notes
+        )
+
+        messages.success(request, "Legacy student added successfully")
+        return redirect("admin_portal")
+
+    return render(request, "add_legacy_student.html")
 
 
 def get_students(request):
@@ -327,3 +545,62 @@ def get_logged_in_students(request):
         for a in logged_in
     ]
     return JsonResponse(data, safe=False)
+
+def admin_student_detail(request, student_id):
+    student = get_object_or_404(
+        Student.objects.using('mysql_db'),
+        id=student_id
+    )
+
+    legacy = getattr(student, "legacyrecord", None)
+
+    present_days = Attendance.objects.using('mysql_db').filter(
+        student=student,
+        is_present=True
+    ).count()
+
+    return JsonResponse({
+        "name": student.name,
+        "email": student.email,
+        "age": student.age,
+        "gender": student.gender,
+        "present_days": present_days,
+        "legacy_sessions": legacy.total_sessions if legacy else 0,
+        "legacy_amount": legacy.total_amount if legacy else 0,
+    })
+
+@csrf_exempt
+def api_save_legacy(request):
+ 
+    print("🔥 api_save_legacy HIT")
+
+    if request.method != "POST":
+        return JsonResponse({"success": False, "error": "Invalid method"}, status=405)
+
+    try:
+        data = json.loads(request.body)
+        print("📦 DATA:", data)
+
+        student_id = data.get("student_id")
+        total_sessions = data.get("total_sessions")
+        total_amount = data.get("total_amount")
+
+        if not student_id:
+            return JsonResponse({"success": False, "error": "Missing student_id"})
+
+        student = Student.objects.using("mysql_db").get(id=student_id)
+
+        LegacyRecord.objects.using("mysql_db").update_or_create(
+            student=student,
+            defaults={
+                "total_sessions": total_sessions,
+                "total_amount": total_amount
+            }
+        )
+
+        print("✅ LEGACY SAVED")
+        return JsonResponse({"success": True})
+
+    except Exception as e:
+        print("❌ ERROR:", str(e))
+        return JsonResponse({"success": False, "error": str(e)}, status=500)

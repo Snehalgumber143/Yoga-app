@@ -104,7 +104,7 @@
     
     <div class="login-body">
       <h2>Welcome</h2>
-      <p>Signup to continue your journey with ZenFlow Yoga Studio</p>
+      <p>Signup to continue your journey with Yoga Dhara Studio</p>
 
      <form method="post" action="{% url 'signup' %}">
         {% csrf_token %}
@@ -160,6 +160,9 @@
 
         <p class="signup-text">
           Already have an account? <a href="{% url 'logins' %}">Login</a>
+        </p>
+        <p class="signup-text">
+          Instructor login <a href="{% url 'logins' %}">Login</a>
         </p>
       </form>
     </div>
