@@ -11,7 +11,7 @@ from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib import messages
 from django.db.models import Count, Q
 from django.db.models.functions import ExtractMonth
-from home.models import Student, Attendance, Contact,LegacyRecord
+from home.models import Student, Attendance, Contact,LegacyRecord,FeePayment
 from django.shortcuts import redirect
 from django.db.models import Sum
 from django.contrib.auth import logout
@@ -604,3 +604,48 @@ def api_save_legacy(request):
     except Exception as e:
         print("❌ ERROR:", str(e))
         return JsonResponse({"success": False, "error": str(e)}, status=500)
+
+@csrf_exempt
+def update_fee_status(request):
+    if request.method != "POST":
+        return JsonResponse({"success": False, "error": "Invalid request"}, status=400)
+
+    try:
+        data = json.loads(request.body)
+        student_id = data.get("student_id")
+        amount = data.get("amount", 0)
+
+        student = Student.objects.get(id=student_id)
+
+        FeePayment.objects.create(
+            student=student,
+            amount=amount
+        )
+
+        student.fees_paid = True
+        student.last_fee_paid_on = now()
+        student.save()
+
+        return JsonResponse({
+            "success": True,
+            "last_paid": student.last_fee_paid_on.strftime("%d %b %Y, %I:%M %p")
+        })
+
+    except Student.DoesNotExist:
+        return JsonResponse({"success": False, "error": "Student not found"}, status=404)
+
+    except Exception as e:
+        return JsonResponse({"success": False, "error": str(e)}, status=500)
+def paid_students_api(request):
+    payments = FeePayment.objects.select_related("student").order_by("-paid_on")
+
+    data = []
+    for p in payments:
+        data.append({
+            "student": p.student.name,
+            "email": p.student.email,
+            "amount": float(p.amount),
+            "paid_on": p.paid_on.strftime("%d %b %Y, %I:%M %p")
+        })
+
+    return JsonResponse({"payments": data})

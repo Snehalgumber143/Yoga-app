@@ -36,7 +36,8 @@ class Student(models.Model):
     password = models.CharField(max_length=128, blank=True)
 
     created_at = models.DateTimeField(auto_now_add=True)
-
+    fees_paid = models.BooleanField(default=False)
+    last_fee_paid_on = models.DateTimeField(null=True, blank=True)
     @property
     def months_enrolled(self):
         today = date.today()
@@ -84,7 +85,13 @@ class LegacyRecord(models.Model):
 
     def __str__(self):
         return f"Legacy - {self.student}"
+class FeePayment(models.Model):
+    student = models.ForeignKey(Student, on_delete=models.CASCADE, related_name="payments")
+    amount = models.DecimalField(max_digits=8, decimal_places=2)
+    paid_on = models.DateTimeField(auto_now_add=True)
 
+    def __str__(self):
+        return f"{self.student.name} - {self.paid_on}"
 class Attendance(models.Model):
     student = models.ForeignKey(Student, on_delete=models.CASCADE)
     date = models.DateField()

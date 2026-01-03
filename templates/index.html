@@ -262,6 +262,30 @@ body { font-family: 'Poppins', sans-serif; background-color: #F9F7FF; color: #3F
            <div class="bg-gray-50 p-4 rounded-xl"> <p class="text-sm text-gray-500">Weight</p> <p class="font-semibold">{{ student.weight }} kg</p> </div> 
            <!-- Months Enrolled --> <div class="bg-primary/10 p-4 rounded-xl col-span-2"> <p class="text-sm text-primary">Membership Duration</p> <p class="text-xl font-bold text-primary"> {{ student.months_enrolled }} months </p> </div>
              <!-- BMI --> <div class="bg-accent/10 p-4 rounded-xl col-span-2"> <p class="text-sm text-gray-600">Body Mass Index</p> <p class="text-xl font-bold"> {{ student.bmi }} <span class="text-sm text-gray-500"> ({{ student.bmi_category }}) </span> </p> </div>
+              <!-- Fee Status -->
+<div class="bg-purple-50 p-5 rounded-2xl col-span-2 mt-2">
+  <p class="text-sm text-purple-600 mb-1">Fee Status</p>
+
+  {% if student.fees_paid %}
+    <p class="text-xl font-bold text-green-600">
+      ✅ Paid
+    </p>
+    <p class="text-sm text-gray-600 mt-1">
+      Last paid on:
+      <span class="font-medium">
+        {{ student.last_fee_paid_on|date:"d M Y, h:i A" }}
+      </span>
+    </p>
+  {% else %}
+    <p class="text-xl font-bold text-red-500">
+      ❌ Payment Pending
+    </p>
+    <p class="text-sm text-gray-500 mt-1">
+      Please contact admin to complete payment
+    </p>
+  {% endif %}
+</div>
+
              </div> <!-- Divider --> <div class="border-t my-8"></div> <!-- Actions --> <div class="flex justify-between items-center text-base"> 
               <a href="{% url 'services' %}" class="text-primary font-semibold hover:underline"> View Attendance </a> <a href="{% url 'logout' %}" class="text-red-500 hover:text-red-600 font-semibold"> Logout </a> </div>
              </div> </div>

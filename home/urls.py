@@ -2,6 +2,8 @@ from django.contrib import admin
 from django.urls import path
 from django.contrib.auth import views as auth_views
 from home import views
+from . import views
+
 urlpatterns = [
     path("logins",views.logins,name='logins'),
     path("",views.index,name='home'),
@@ -24,5 +26,10 @@ urlpatterns = [
     path('signup/', views.signup, name='signup'),
     path("schedule",views.schedule,name='schedule'),
     path('get-logged-in-students/', views.get_logged_in_students, name='get_logged_in_students'),
-    path('export-attendance/', views.export_attendance, name='export_attendance')
+    path('export-attendance/', views.export_attendance, name='export_attendance'),
+    path("api/paid-students/", views.paid_students_api, name="paid_students_api"),
+    path("api/update-fee-status/", views.update_fee_status, name="update_fee_status")
+
+
+
 ]

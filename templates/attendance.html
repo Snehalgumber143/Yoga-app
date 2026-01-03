@@ -1,9 +1,11 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Attendance - ZenFlow Yoga Studio</title>
+<link rel="icon" type="image/x-icon" href="{% static 'hello/images/favicon.png' %}">
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <style>
 * {
@@ -290,7 +292,7 @@ body {
 }
 
 .calendar-day.present {
-  background: #6d5df6;
+  background: #20a320ff;
   color: white;
 }
 
