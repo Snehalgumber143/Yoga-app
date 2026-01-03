@@ -1,322 +1,269 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>About Us - ZenFlow Yoga Studio</title>
+<title>About Us – Yog Dhara</title>
+
+<!-- Tailwind -->
 <script src="https://cdn.tailwindcss.com/3.4.16"></script>
-<script>tailwind.config={theme:{extend:{colors:{primary:'#2E8B57',secondary:'#8B5E3C'},borderRadius:{'none':'0px','sm':'4px',DEFAULT:'8px','md':'12px','lg':'16px','xl':'20px','2xl':'24px','3xl':'32px','full':'9999px','button':'8px'}}}}</script>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.6.0/remixicon.min.css">
-<style>
-:where([class^="ri-"])::before { content: "\f3c2"; }
-body {
-font-family: 'Poppins', sans-serif;
-background-color: #F8F8F8;
+<script>
+tailwind.config = {
+  theme: {
+    extend: {
+      colors: {
+        primary: '#A78BFA',
+        primaryDark: '#7C6AE6',
+        accent: '#C4B5FD',
+        bgsoft: '#F6F5FF',
+        textdark: '#2E2E3A',
+        textmuted: '#6B6B80'
+      },
+      borderRadius: {
+        button: '10px'
+      }
+    }
+  }
 }
-.nav-link {
-position: relative;
-}
-.nav-link::after {
-content: '';
-position: absolute;
-width: 0;
-height: 2px;
-bottom: -2px;
-left: 0;
-background-color: #2E8B57;
-transition: width 0.3s ease;
-}
-.nav-link:hover::after {
-width: 100%;
-}
-</style>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+</script>
+
+<!-- Fonts & Icons -->
 <link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.6.0/remixicon.min.css">
+
 <style>
-:where([class^="ri-"])::before { content: "\f3c2"; }
 body {
-font-family: 'Poppins', sans-serif;
-background-color: #F8F8F8;
-color: #333;
+  font-family: 'Poppins', sans-serif;
+  background-color: #f6f5ffbf;
+  color: #2E2E3A;
 }
+
 .nav-link {
-position: relative;
+  position: relative;
 }
+
 .nav-link::after {
-content: '';
-position: absolute;
-width: 0;
-height: 2px;
-bottom: -2px;
-left: 0;
-background-color: #2E8B57;
-transition: width 0.3s ease;
+  content: '';
+  position: absolute;
+  width: 0;
+  height: 2px;
+  bottom: -3px;
+  left: 0;
+  background-color: #A78BFA;
+  transition: width 0.3s ease;
 }
+
 .nav-link:hover::after {
-width: 100%;
+  width: 100%;
 }
+
 .hero-section {
-background: linear-gradient(to right, rgba(255,255,255,0.9) 50%, rgba(255,255,255,0.8) 100%);
-position: relative;
-overflow: hidden;
+  background: linear-gradient(
+    to right,
+    rgba(246,245,255,0.95) 45%,
+    rgba(246, 245, 255, 0.75) 100%
+  );
+  position: relative;
+  overflow: hidden;
 }
+
 .hero-image {
-position: absolute;
-right: 0;
-top: 0;
-width: 50%;
-height: 100%;
-object-fit: cover;
-z-index: -1;
+  position: absolute;
+  right: 0;
+  top: 0;
+  width: 50%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0.85;
 }
-.benefit-card {
-transition: transform 0.3s ease;
-}
-.benefit-card:hover {
-transform: translateY(-5px);
-}
+
 .cta-button {
-background: linear-gradient(45deg, #2E8B57, #3da067);
-transition: transform 0.3s ease;
+  background: linear-gradient(135deg, #A78BFA, #7C6AE6);
+  color: white;
+  padding: 0.6rem 1.6rem;
+  border-radius: 10px;
+  font-weight: 500;
+  transition: all 0.3s ease;
 }
+
 .cta-button:hover {
-transform: translateY(-2px);
+  transform: translateY(-2px);
+  box-shadow: 0 12px 24px rgba(167,139,250,0.35);
 }
-{% load static %}
 </style>
 </head>
+
 <body>
-<header class="bg-white shadow-sm fixed w-full top-0 z-50">
-<nav class="container mx-auto px-6 py-4 flex items-center justify-between">
-<h1 class="font-['Pacifico'] text-3xl text-primary">Yoga Dhara</h1>
-<div class="hidden md:flex items-center space-x-8">
-<a href="{% url 'home' %}" class="nav-link text-gray-700 hover:text-primary transition-colors">Home</a>
-<a href="#" class="nav-link text-gray-700 hover:text-primary transition-colors">Attendance</a>
-<a href="{% url 'about' %}" class="nav-link text-gray-700 hover:text-primary transition-colors">About</a>
-<a href="#" class="nav-link text-gray-700 hover:text-primary transition-colors">Contact</a>
-<button class="bg-primary text-white px-6 py-2 !rounded-button shadow hover:bg-primary/90 transition-all whitespace-nowrap">
-Get Started
-</button>
-</div>
-<button class="md:hidden w-10 h-10 flex items-center justify-center">
-<i class="ri-menu-line text-2xl"></i>
-</button>
-</nav>
+
+<!-- HEADER -->
+<header class="fixed top-0 w-full z-50 bg-[#e5d2e8]/80 backdrop-blur-md shadow-sm">
+  <nav class="container mx-auto px-6 py-4 flex items-center justify-between">
+    <h1 class="font-['Pacifico'] text-3xl text-primary">Yog Dhara</h1>
+
+    <div class="hidden md:flex items-center space-x-8">
+      <a href="{% url 'home' %}" class="nav-link text-textmuted hover:text-primary">Home</a>
+      <a href="{% url 'about' %}" class="nav-link text-primary font-medium">About</a>
+      <a href="{% url 'schedule' %}" class="nav-link text-textmuted hover:text-primary">Schedule</a>
+      <a href="{% url 'contact' %}" class="nav-link text-textmuted hover:text-primary">Contact</a>
+      <button class="cta-button">Join Now</button>
+    </div>
+
+    <button class="md:hidden">
+      <i class="ri-menu-line text-2xl text-primary"></i>
+    </button>
+  </nav>
 </header>
-<body>
-<header class="bg-white shadow-sm fixed w-full top-0 z-50">
-<nav class="container mx-auto px-6 py-4 flex items-center justify-between">
-<h1 class="font-['Pacifico'] text-3xl text-primary">Yog Dhara</h1>
-<div class="hidden md:flex items-center space-x-8">
-<a href="{% url 'home' %}" class="nav-link text-gray-700 hover:text-primary transition-colors">Home</a>
-<a href="{% url 'about' %}" class="nav-link text-primary border-b-2 border-primary">About</a>
-<a href="{% url 'schedule' %}" class="nav-link text-gray-700 hover:text-primary transition-colors">Schedule</a>
-<a href="{% url 'contact' %}" class="nav-link text-gray-700 hover:text-primary transition-colors">Contact</a>
-<button class="bg-primary text-white px-6 py-2 !rounded-button shadow hover:bg-primary/90 transition-all whitespace-nowrap">
-Join Now
-</button>
-</div>
-<button class="md:hidden w-10 h-10 flex items-center justify-center">
-<i class="ri-menu-line text-2xl"></i>
-</button>
-</nav>
-</header>
-<main class="mt-20">
+
+<main class="mt-24">
+
+<!-- HERO -->
 <section class="hero-section min-h-[600px] flex items-center">
-<img src="https://readdy.ai/api/search-image?query=A%2520modern%2520yoga%2520studio%2520interior%2520with%2520natural%2520light%2520streaming%2520through%2520large%2520windows.%2520The%2520space%2520features%2520clean%2520lines%252C%2520bamboo%2520flooring%252C%2520and%2520minimalist%2520decor%2520with%2520potted%2520plants.%2520Yoga%2520mats%2520are%2520neatly%2520arranged%252C%2520creating%2520an%2520inviting%2520and%2520peaceful%2520atmosphere%2520for%2520practice.&width=800&height=600&seq=1&orientation=landscape"
-alt="Yoga Studio"
-class="hero-image">
-<div class="container mx-auto px-6 py-20">
-<div class="max-w-xl">
-<h2 class="text-4xl md:text-5xl font-semibold text-gray-800 mb-6">
-Welcome to Our Yoga Studio
-</h2>
-<p class="text-lg text-gray-600 mb-8">
-Expert-led classes in a serene environment designed to help you achieve your wellness goals.
-</p>
-<div class="flex gap-4">
-</div>
-</div>
-</section>
-<section class="py-16 bg-gray-50">
-<div class="container mx-auto px-6">
-<div class="max-w-4xl mx-auto">
-<h2 class="text-3xl font-semibold text-primary mb-12 text-center">Meet Our Lead Instructor</h2>
-<div class="flex flex-col md:flex-row gap-12 items-start">
-<div class="md:w-1/3">
-<img src="static/hello/images/profile.jpeg"
-alt="Sarah Mitchell - Lead Yoga Instructor"
-class="w-full rounded-lg shadow-lg">
-</div>
-<div class="md:w-2/3">
-<h3 class="text-2xl font-semibold text-gray-800 mb-4">Palak Gumber</h3>
-<p class="text-gray-600 mb-6 text-lg leading-relaxed">
-I am a passionate yoga trainer with over five years of experience in practicing and teaching yoga. I believe that training the mind to stay in the present moment is the key to living a worry-free life, as the present alone is real—neither a memory nor an imagination. This philosophy forms the foundation of my approach to yoga and meditation.
-Over the years, I have helped individuals improve their health by addressing conditions such as heart disease, diabetes, thyroid disorders, arthritis, and weight management through the holistic practices of yoga. I have completed my Bachelor’s and Master’s degrees in Yogic Science from Dev Sanskriti Vishwavidyalaya, Haridwar, and I am currently pursuing a PhD in Yoga from HNB Garhwal University.
-My journey into yoga training was inspired by the book Happiness is the Key to Success, written by a Yogi, which motivated me to explore the transformative power of yoga deeply. I have also worked as a yoga trainer at SARVA for 1.5 years, where I guided individuals in both traditional and modern styles of yoga, including Ashtanga Vinyasa, Hatha Yoga, and high-intensity forms.
-With a strong foundation in both practice and research, I am committed to helping individuals cultivate mindfulness, strength, and overall well-being through yoga.
-</p>
-<h3 class="text-2xl font-semibold text-gray-800 mb-4">Follow me on:</h3>
-<div class="flex space-x-4">
-<a href="#" class="text-primary hover:text-primary/80 transition-colors">
-<div class="w-8 h-8 flex items-center justify-center">
-<i class="ri-instagram-line text-xl"></i>
-</div>
-</a>
-<a href="#" class="text-primary hover:text-primary/80 transition-colors">
-<div class="w-8 h-8 flex items-center justify-center">
-<i class="ri-facebook-line text-xl"></i>
-</div>
-</a>
-<a href="https://www.linkedin.com/in/palak-gumber-51ba97189?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=android_app" class="text-primary hover:text-primary/80 transition-colors">
-<div class="w-8 h-8 flex items-center justify-center">
-<i class="ri-linkedin-line text-xl"></i>
-</div>
-</a>
-</div>
-</div>
-</div>
-</div>
-</div>
-</section>
-<section class="py-16">
+  <img src="{% static 'hello/images/nature.jpg' %}"
+       class="hero-image hidden lg:block"
+       alt="Yoga Studio">
+
   <div class="container mx-auto px-6">
-    <h2 class="text-3xl font-semibold text-primary mb-12 text-center">Instructor Qualifications</h2>
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-      
-      <!-- Card 1: B.Sc. -->
-      <div class="bg-white rounded-lg shadow-sm p-6 border-t-4 border-primary text-center">
-        <div class="flex justify-center mb-4">
-          <div class="w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center">
-            <i class="ri-graduation-cap-line text-primary"></i>
-          </div>
-        </div>
-        <p class="font-semibold text-gray-800 text-lg mb-4">B.Sc. in Yoga and Human Consciousness</p>
-        <p class="text-gray-600">
-          Foundation in yogic science, philosophy, and physical practices, forming the academic base of the instructor’s journey.
-        </p>
-      </div>
-
-      <!-- Card 2: M.Sc. -->
-      <div class="bg-white rounded-lg shadow-sm p-6 border-t-4 border-primary text-center">
-        <div class="flex justify-center mb-4">
-          <div class="w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center">
-            <i class="ri-graduation-cap-line text-primary"></i>
-          </div>
-        </div>
-        <p class="font-semibold text-gray-800 text-lg mb-4">M.Sc. in Yoga and Human Consciousness</p>
-        <p class="text-gray-600">
-          Advanced studies in yogic therapy, meditation, and integrative wellness practices.
-        </p>
-      </div>
-
-      <!-- Card 3: Ph.D. -->
-      <div class="bg-white rounded-lg shadow-sm p-6 border-t-4 border-primary text-center">
-        <div class="flex justify-center mb-4">
-          <div class="w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center">
-            <i class="ri-graduation-cap-line text-primary"></i>
-          </div>
-        </div>
-        <p class="font-semibold text-gray-800 text-lg mb-4">Ph.D. in Yoga and Human Consciousness</p>
-        <p class="text-gray-600">
-          Doctoral research focused on the transformative power of yoga on human psychology, awareness, and well-being.
-        </p>
-      </div>
-
-      <!-- Card 4: Experience -->
-      <div class="bg-white rounded-lg shadow-sm p-6 border-t-4 border-primary text-center">
-        <div class="flex justify-center mb-4">
-          <div class="w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center">
-            <i class="ri-time-line text-primary"></i>
-          </div>
-        </div>
-        <p class="font-semibold text-gray-800 text-lg mb-4">5+ Years of Experience</p>
-        <p class="text-gray-600">
-          Successfully taught students from all levels, specializing in therapeutic yoga, mindfulness, and holistic transformation.
-        </p>
-      </div>
-
+    <div class="max-w-xl">
+      <h2 class="text-4xl md:text-5xl font-semibold mb-6">
+        Welcome to Yog Dhara
+      </h2>
+      <p class="text-lg text-textmuted mb-8">
+        Expert-led classes in a serene environment designed to help you achieve balance, awareness, and inner peace.
+      </p>
     </div>
   </div>
 </section>
 
-<section class="py-16 bg-gray-50">
-<div class="container mx-auto px-6">
-<div class="max-w-3xl mx-auto text-center">
-<h2 class="text-3xl font-semibold text-primary mb-4">Ready to Begin Your Journey?</h2>
-<p class="text-gray-600 mb-8 text-lg">Join our community and experience the transformative power of yoga with expert guidance</p>
-</div>
-</div>
+<!-- INSTRUCTOR -->
+<section class="py-20 bg-white">
+  <div class="container mx-auto px-6 max-w-5xl">
+    <h2 class="text-3xl font-semibold text-primary mb-12 text-center">
+      Meet Our Lead Instructor
+    </h2>
+
+    <div class="flex flex-col md:flex-row gap-12">
+      <div class="md:w-1/3">
+        <img src="{% static 'hello/images/about.jpeg' %}"
+             class="rounded-2xl shadow-xl"
+             alt="Palak Gumber">
+      </div>
+
+      <div class="md:w-2/3">
+        <h3 class="text-2xl font-semibold mb-4">Palak Gumber</h3>
+        <p class="text-textmuted leading-relaxed mb-6">
+          I am a passionate yoga trainer with over five years of experience in practicing and teaching yoga. I believe that training the mind to stay in the present moment is the key to living a worry-free life, as the present alone is real—neither a memory nor an imagination. This philosophy forms the foundation of my approach to yoga and meditation. Over the years, I have helped individuals improve their health by addressing conditions such as heart disease, diabetes, thyroid disorders, arthritis, and weight management through the holistic practices of yoga. I have completed my Bachelor’s and Master’s degrees in Yogic Science from Dev Sanskriti Vishwavidyalaya, Haridwar, and I am currently pursuing a PhD in Yoga from HNB Garhwal University. My journey into yoga training was inspired by the book Happiness is the Key to Success, written by a Yogi, which motivated me to explore the transformative power of yoga deeply. I have also worked as a yoga trainer at SARVA for 1.5 years, where I guided individuals in both traditional and modern styles of yoga, including Ashtanga Vinyasa, Hatha Yoga, and high-intensity forms. With a strong foundation in both practice and research, I am committed to helping individuals cultivate mindfulness, strength, and overall well-being through yoga.
+          <br><br>
+          With a strong foundation in both practice and research, I am committed to helping individuals cultivate mindfulness, strength, and holistic well-being.
+        </p>
+
+        <div class="flex gap-4">
+          <a href="#" class="text-primary text-xl"><i class="ri-instagram-line"></i></a>
+          <a href="#" class="text-primary text-xl"><i class="ri-facebook-line"></i></a>
+          <a href="https://www.linkedin.com/in/palak-gumber-51ba97189" class="text-primary text-xl"><i class="ri-linkedin-line"></i></a>
+        </div>
+      </div>
+    </div>
+  </div>
 </section>
-<footer class="bg-gray-900 text-white py-12">
-<div class="container mx-auto px-6">
-<div class="grid grid-cols-1 md:grid-cols-4 gap-8">
-<div>
-<h3 class="font-['Pacifico'] text-2xl mb-4">logo</h3>
-<p class="text-gray-400">
-Transform your life through the practice of yoga and mindfulness.
-</p>
-</div>
-<div>
-<h4 class="text-lg font-semibold mb-4">Quick Links</h4>
-<ul class="space-y-2">
-<li><a href="#" class="text-gray-400 hover:text-white transition-colors">Classes</a></li>
-<li><a href="#" class="text-gray-400 hover:text-white transition-colors">Schedule</a></li>
-<li><a href="#" class="text-gray-400 hover:text-white transition-colors">Pricing</a></li>
-<li><a href="#" class="text-gray-400 hover:text-white transition-colors">Workshops</a></li>
-</ul>
-</div>
-<div>
-<h4 class="text-lg font-semibold mb-4">Contact</h4>
-<ul class="space-y-2">
-<li class="flex items-center">
-<i class="ri-map-pin-line mr-2"></i>
-<span class="text-gray-400">123 Yoga Street, Zen City</span>
-</li>
-<li class="flex items-center">
-<i class="ri-phone-line mr-2"></i>
-<span class="text-gray-400">+1 234 567 8900</span>
-</li>
-<li class="flex items-center">
-<i class="ri-mail-line mr-2"></i>
-<span class="text-gray-400">info@zenflow.com</span>
-</li>
-</ul>
-</div>
-<div>
-<h4 class="text-lg font-semibold mb-4">Follow Us</h4>
-<div class="flex space-x-4">
-<a href="#" class="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-primary transition-colors">
-<i class="ri-facebook-fill"></i>
-</a>
-<a href="#" class="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-primary transition-colors">
-<i class="ri-instagram-fill"></i>
-</a>
-<a href="#" class="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-primary transition-colors">
-<i class="ri-twitter-fill"></i>
-</a>
-<a href="#" class="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-primary transition-colors">
-<i class="ri-youtube-fill"></i>
-</a>
-</div>
-</div>
-</div>
-<div class="border-t border-gray-800 mt-12 pt-8 flex flex-col md:flex-row justify-between items-center">
-<p class="text-gray-400 text-sm">© 2025 ZenFlow Yoga Studio. All rights reserved.</p>
-<div class="flex space-x-6 mt-4 md:mt-0">
-<a href="#" class="text-gray-400 hover:text-white transition-colors text-sm">Privacy Policy</a>
-<a href="#" class="text-gray-400 hover:text-white transition-colors text-sm">Terms of Service</a>
-<a href="#" class="text-gray-400 hover:text-white transition-colors text-sm">Cookie Policy</a>
-</div>
-</div>
-</div>
+
+<section class="relative py-20 overflow-hidden">
+  <!-- Background that WILL be blurred -->
+  <div
+    class="absolute inset-0
+           bg-[url('/static/hello/images/daisies.png')]
+           bg-cover bg-center">
+  </div>
+
+  <!-- Glass overlay -->
+  <div class="absolute inset-0 bg-[#7C6AE6]/15 backdrop-blur-3xl"></div>
+
+  <!-- CONTENT -->
+  <div class="relative z-10 container mx-auto px-6">
+    <h2 class="text-3xl font-semibold text-[#4B3FA3] mb-12 text-center">
+      Instructor Qualifications
+    </h2>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+      {% for item in "1234"|make_list %}
+      <div
+        class="bg-white/55 backdrop-blur-2xl
+               rounded-2xl p-6
+               border border-white/40
+               shadow-[0_10px_35px_rgba(124,106,230,0.25)]
+               transition-all duration-300 hover:-translate-y-2">
+
+        <div class="w-12 h-12 mx-auto mb-4 rounded-full
+                    bg-[#7C6AE6]/25 flex items-center justify-center">
+          <i class="ri-graduation-cap-line text-[#7C6AE6] text-xl"></i>
+        </div>
+
+        <p class="font-semibold text-[#3D347A] mb-3 text-center">
+          {% if item == '4' %}5+ Years Experience{% else %}Advanced Yoga Degree{% endif %}
+        </p>
+
+        <p class="text-[#5E5A7A] text-sm text-center leading-relaxed">
+          Deep academic and practical understanding of yogic science and holistic healing.
+        </p>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+
+<!-- CTA -->
+<section class="py-20 bg-white text-center">
+  <h2 class="text-3xl font-semibold text-primary mb-4">
+    Ready to Begin Your Journey?
+  </h2>
+  <p class="text-textmuted mb-8 text-lg">
+    Join our mindful community and experience transformation through yoga.
+  </p>
+  <a href="{% url 'home' %}" class="cta-button inline-block">Get Started</a>
+</section>
+
+<!-- FOOTER -->
+<footer class="bg-[#1F1F2E] text-white py-14">
+  <div class="container mx-auto px-6 grid grid-cols-1 md:grid-cols-4 gap-8">
+
+    <div>
+      <h3 class="font-['Pacifico'] text-2xl mb-4">Yog Dhara</h3>
+      <p class="text-white/70">
+        Transforming lives through yoga, awareness, and mindful living.
+      </p>
+    </div>
+
+    <div>
+      <h4 class="font-semibold mb-4">Quick Links</h4>
+      <ul class="space-y-2 text-white/70">
+        <li>Classes</li>
+        <li>Schedule</li>
+        <li>Workshops</li>
+      </ul>
+    </div>
+
+    <div>
+      <h4 class="font-semibold mb-4">Contact</h4>
+      <p class="text-white/70">info@yogdhara.com</p>
+    </div>
+
+    <div>
+      <h4 class="font-semibold mb-4">Follow Us</h4>
+      <div class="flex gap-4">
+        <i class="ri-instagram-fill"></i>
+        <i class="ri-facebook-fill"></i>
+        <i class="ri-youtube-fill"></i>
+      </div>
+    </div>
+  </div>
+
+  <div class="text-center text-white/50 mt-10 text-sm">
+    © 2025 Yog Dhara. All rights reserved.
+  </div>
 </footer>
+
 </main>
 </body>
 </html>

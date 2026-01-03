@@ -1,12 +1,16 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Contact Us -  Yoga Dhara Studio</title>
+  <title>Contact Us – Yoga Dhara Studio</title>
 
   <!-- Bootstrap CSS -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
+  <!-- Google Font -->
+  <link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet">
 
   <style>
     * {
@@ -17,159 +21,266 @@
     }
 
     body {
-      background-color: #f9fafb;
-      color: #111827;
+      min-height: 100vh;
+      background: linear-gradient(135deg, #f6f4ff, #ece9ff);
+      color: #2e2a5a;
+      padding-top: 70px;
     }
 
-    header {
-      background-color: #ffffff;
-      border-bottom: 1px solid #e5e7eb;
-      padding: 1rem 2rem;
-      position: sticky;
-      top: 0;
-      z-index: 1000;
-    }
+    /* ---------- NAVBAR ---------- */
+    /* ---------- GLASS LAVENDER NAVBAR ---------- */
+header {
+  position: fixed;
+  top: 0;
+  width: 100%;
+  z-index: 1000;
 
-    .navbar {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
+  background: rgba(124, 106, 230, 0.65);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
 
-    .logo {
-      color: #1f2937;
-      font-size: 1.5rem;
-      font-weight: bold;
-    }
+  border-bottom: 1px solid rgba(255, 255, 255, 0.25);
+}
 
-    nav ul {
-      list-style: none;
-      display: flex;
-      gap: 1.5rem;
-    }
+.navbar {
+  max-width: 1200px;
+  margin: auto;
+  padding: 10px 24px;   /* 👈 thin */
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
 
-    nav a {
-      text-decoration: none;
-      color: #374151;
-      font-weight: 500;
-    }
+.logo {
+  font-family: 'Pacifico', cursive;
+  font-size: 1.6rem;
+  color: #ffffff;
+}
 
-    .get-started {
-      background-color: #8b5cf6;
-      color: white;
-      padding: 0.5rem 1rem;
-      border-radius: 8px;
-    }
+nav ul {
+  list-style: none;
+  display: flex;
+  align-items: center;
+  gap: 28px;
+}
 
+nav a {
+  text-decoration: none;
+  color: rgba(255, 255, 255, 0.9);
+  font-weight: 500;
+  position: relative;
+  font-size: 0.95rem;
+}
+
+/* underline */
+nav a::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: -6px;
+  width: 0;
+  height: 2px;
+  background: #ffffff;
+  transition: width 0.3s ease;
+}
+
+nav a:hover::after,
+nav a.active::after {
+  width: 100%;
+}
+
+nav a.active {
+  color: #ffffff;
+  font-weight: 600;
+}
+
+
+    /* ---------- CONTACT CARD ---------- */
     .contact-container {
-      max-width: 600px;
+      max-width: 620px;
       margin: 4rem auto;
-      padding: 2rem;
-      background: #ffffff;
-      border-radius: 12px;
-      box-shadow: 0 10px 15px rgba(0, 0, 0, 0.05);
+      padding: 2.5rem;
+      background: rgba(255, 255, 255, 0.55);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-radius: 24px;
+      border: 1px solid rgba(255, 255, 255, 0.5);
+      box-shadow: 0 20px 50px rgba(124, 106, 230, 0.25);
       text-align: center;
     }
 
     .contact-image {
       width: 100%;
-      max-height: 250px;
+      max-height: 240px;
       object-fit: cover;
-      border-radius: 12px 12px 0 0;
+      border-radius: 18px;
       margin-bottom: 1.5rem;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
     }
 
     .contact-container h2 {
-      font-size: 2rem;
-      margin-bottom: 1rem;
+      font-size: 2.2rem;
+      margin-bottom: 0.8rem;
+      color: #4b3fbf;
     }
 
     .contact-container p {
       margin-bottom: 2rem;
-      color: #6b7280;
+      color: #5f5b8a;
     }
 
-    .contact-form {
-      display: flex;
-      flex-direction: column;
-      gap: 1rem;
-      text-align: left;
-    }
+    /* ---------- FORM ---------- */
+.contact-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.1rem;
+  text-align: left;
 
-    .contact-form label {
-      font-weight: 600;
-      color: #374151;
-    }
+  padding: 1.5rem;
+  border-radius: 20px;
 
-    .contact-form input,
-    .contact-form textarea {
-      padding: 0.75rem;
-      border: 1px solid #d1d5db;
-      border-radius: 8px;
-      font-size: 1rem;
-    }
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.35),
+    rgba(255, 255, 255, 0.15)
+  );
 
-    .contact-form button {
-      background-color: #10b981;
-      color: white;
-      padding: 0.75rem;
-      border: none;
-      border-radius: 8px;
-      font-size: 1rem;
-      cursor: pointer;
-      transition: background-color 0.2s ease-in-out;
-    }
+  backdrop-filter: blur(22px);
+  -webkit-backdrop-filter: blur(22px);
 
-    .contact-form button:hover {
-      background-color: #059669;
-    }
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  box-shadow:
+    0 20px 45px rgba(124, 106, 230, 0.35),
+    inset 0 1px 1px rgba(255, 255, 255, 0.4);
+}
+
+/* LABELS */
+.contact-form label {
+  font-weight: 600;
+  color: #4b3fbf;
+  font-size: 0.85rem;
+  letter-spacing: 0.3px;
+}
+
+/* INPUTS & TEXTAREA */
+.contact-form input,
+.contact-form textarea {
+  padding: 0.85rem 1.1rem;
+  border-radius: 14px;
+
+  border: 1px solid rgba(255, 255, 255, 0.45);
+  background: rgba(255, 255, 255, 0.55);
+
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+
+  font-size: 0.95rem;
+  color: #2e2b5f;
+  outline: none;
+
+  box-shadow:
+    inset 0 1px 2px rgba(255, 255, 255, 0.6),
+    0 8px 20px rgba(124, 106, 230, 0.15);
+
+  transition: all 0.25s ease;
+}
+
+/* FOCUS STATE */
+.contact-form input:focus,
+.contact-form textarea:focus {
+  background: rgba(255, 255, 255, 0.75);
+  border-color: rgba(124, 106, 230, 0.7);
+
+  box-shadow:
+    0 0 0 3px rgba(124, 106, 230, 0.25),
+    0 10px 30px rgba(124, 106, 230, 0.25);
+}
+
+/* BUTTON */
+.contact-form button {
+  margin-top: 1.2rem;
+
+  background: linear-gradient(135deg, #7c6ae6, #a79bff);
+  color: white;
+
+  padding: 0.9rem 1.2rem;
+  border: none;
+  border-radius: 999px;
+
+  font-size: 0.95rem;
+  font-weight: 600;
+  letter-spacing: 0.4px;
+
+  cursor: pointer;
+
+  box-shadow:
+    0 12px 30px rgba(124, 106, 230, 0.5),
+    inset 0 1px 1px rgba(255, 255, 255, 0.4);
+
+  transition: all 0.25s ease;
+}
+
+.contact-form button:hover {
+  transform: translateY(-2px);
+  box-shadow:
+    0 18px 40px rgba(124, 106, 230, 0.65);
+}
+
   </style>
 </head>
+
 <body>
 
-  <header>
-    <div class="navbar">
-      <h1 class="logo">Yoga Dhara</h1>
-      <nav>
-        <ul>
-          <li><a href="{% url 'home' %}">Home</a></li>
-          <li><a href="{% url 'services' %}">Attendance</a></li>
-          <li><a href="{% url 'about' %}">About</a></li>
-        </ul>
-      </nav>
-    </div>
-  </header>
+<header>
+  <div class="navbar">
+    <h1 class="logo">Yoga Dhara</h1>
+    <nav>
+      <ul>
+        <li><a href="{% url 'home' %}">Home</a></li>
+        <li><a href="{% url 'services' %}">Attendance</a></li>
+        <li><a href="{% url 'about' %}">About</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
 
-  <main class="contact-container">
-    <img src="static/hello/images/chelsea-gates-n8L1VYaypcw-unsplash.jpg" alt="Yoga studio" class="contact-image" />
-    <h2>Contact Us</h2>
-    <p>Feel free to contact us with any questions or feedback you may have.</p>
-    <form class="contact-form" method="post" action="/contact">
-      {% csrf_token %}
-      <label for="name">Name</label>
-      <input type="text" name="name" id="name" placeholder="Your name" required />
+<main class="contact-container">
+  <img src="{% static 'hello/images/contact.jpg' %}"
+       alt="Yoga studio"
+       class="contact-image" />
 
-      <label for="email">Email</label>
-      <input type="email" name="email" id="email" placeholder="Your email" required />
+  <h2>Contact Us</h2>
+  <p>We’d love to hear from you. Send us your questions or feedback.</p>
 
-      <label for="message">Message</label>
-      <textarea id="message" name="description" rows="5" placeholder="Your message" required></textarea>
+  <form class="contact-form" method="post" action="/contact">
+    {% csrf_token %}
 
-      <button type="submit">Send Message</button>
-    </form>
-  </main>
+    <label for="name">Name</label>
+    <input type="text" name="name" id="name" placeholder="Your name" required />
+
+    <label for="email">Email</label>
+    <input type="email" name="email" id="email" placeholder="Your email" required />
+
+    <label for="message">Message</label>
+    <textarea id="message" name="description" rows="5"
+              placeholder="Your message" required></textarea>
+
+    <button type="submit">Send Message</button>
+  </form>
+</main>
+
 {% if messages %}
   {% for message in messages %}
-    <div class="alert alert-{{ message.tags }} alert-dismissible fade show position-fixed top-0 end-0 m-3 shadow" role="alert" style="z-index: 1100; min-width: 300px;">
+    <div class="alert alert-{{ message.tags }} alert-dismissible fade show position-fixed top-0 end-0 m-3 shadow"
+         role="alert"
+         style="z-index: 1100; min-width: 300px;">
       <strong>{{ message|capfirst }}</strong>
-      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+      <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
     </div>
   {% endfor %}
 {% endif %}
 
-  <!-- Bootstrap JS and Popper -->
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
-  
 </body>
 </html>
