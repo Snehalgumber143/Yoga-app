@@ -207,7 +207,6 @@ def admin_portal(request):
     students = Student.objects.using('mysql_db').all()
     feedbacks = Contact.objects.all().order_by('-date')
 
-    # ✅ GLOBAL DASHBOARD STATS
     total_students = students.count()
 
     total_attendance_sessions = Attendance.objects.using(
@@ -235,7 +234,6 @@ def admin_portal(request):
 
     legacy_sessions = 0
     legacy_amount = 0
-
     present_count = 0
     total_fee = 0
     total_sessions = 0
@@ -252,36 +250,33 @@ def admin_portal(request):
             student=student
         )
 
-        # Attendance stats
-        present_count = attendance_records.filter(
-            is_present=True
-        ).count()
+        present_count = attendance_records.filter(is_present=True).count()
 
         total_fee = attendance_records.aggregate(
             total=Sum("fee")
         )["total"] or 0
 
-        # Legacy data
         legacy_record = getattr(student, "legacyrecord", None)
         if legacy_record:
             legacy_sessions = legacy_record.total_sessions
             legacy_amount = legacy_record.total_amount
 
-        # Combined stats
         total_sessions = legacy_sessions + present_count
         total_paid = legacy_amount + total_fee
 
-        # Fee status (simple logic)
-        if total_paid > 0:
-            fee_status = "Paid"
-        else:
-            fee_status = "Due"
+        fee_status = "Paid" if total_paid > 0 else "Due"
 
-        # Calendar map
+        # ✅ CORRECT ATTENDANCE MAP
+        attendance_map = {}
         for record in attendance_records:
-            attendance_map[
-                record.date.strftime('%Y-%m-%d')
-            ] = "present" if record.is_present else "absent"
+            if record.session_status == "frozen":
+                status = "frozen"
+            elif record.session_status == "postponed":
+                status = "postponed"
+            else:
+                status = "present" if record.is_present else "absent"
+
+            attendance_map[record.date.strftime('%Y-%m-%d')] = status
 
     return render(request, 'admin_portal.html', {
         'students': students,
@@ -291,15 +286,13 @@ def admin_portal(request):
         'total_students': total_students,
         'admin_sessions': total_attendance_sessions,
         'total_revenue': total_revenue,
-
-        # 👇 NEW IMPORTANT DATA
         'legacy_sessions': legacy_sessions,
         'legacy_amount': legacy_amount,
         'present_count': present_count,
         'total_sessions': total_sessions,
         'total_paid': total_paid,
         'fee_status': fee_status,
-        "feedbacks": feedbacks
+        'feedbacks': feedbacks
     })
 
 @csrf_exempt
@@ -335,7 +328,7 @@ def save_attendance(request):
     if request.method != "POST":
         return JsonResponse({'success': False, 'error': 'Invalid request method'})
 
-    # ---------- API / JSON ----------
+    # ---------- JSON / API ----------
     if request.content_type == "application/json":
         try:
             data = json.loads(request.body)
@@ -344,26 +337,32 @@ def save_attendance(request):
 
             for entry in attendance_data:
                 student_id = entry.get('student_id')
+                student = get_object_or_404(Student, id=student_id)
+
                 date_str = entry.get('date')
                 class_type = entry.get('class_type', 'Yoga')
                 instructor = entry.get('instructor', 'Admin')
-                status = entry.get('status', 'absent')
+                status = entry.get('status', 'absent').lower()
 
-                if not student_id or not date_str:
-                    continue
+                # ---- status handling ----
+                session_status = 'normal'
+                is_present = False
+                fee = 0
 
-                student = Student.objects.using('mysql_db').get(id=student_id)
-                is_present = status.lower() == 'present'
-
-                fee = SESSION_FEE if is_present else 0
+                if status in ['frozen', 'postponed']:
+                    session_status = status
+                else:
+                    is_present = (status == 'present')
+                    fee = SESSION_FEE if is_present else 0
 
                 Attendance.objects.using('mysql_db').update_or_create(
-                    student_id=student.id,
+                    student=student,
                     date=date_str,
+                    class_type=class_type,
                     defaults={
-                        'class_type': class_type,
                         'instructor': instructor,
                         'is_present': is_present,
+                        'session_status': session_status,
                         'fee': fee
                     }
                 )
@@ -372,7 +371,7 @@ def save_attendance(request):
                     'student_id': student.id,
                     'name': student.name,
                     'date': date_str,
-                    'status': status,
+                    'status': session_status if session_status != 'normal' else status,
                     'fee': fee
                 })
 
@@ -388,26 +387,35 @@ def save_attendance(request):
             if not student_id:
                 return JsonResponse({'success': False, 'error': 'Missing student_id'})
 
-            is_present = request.POST.get("is_present") == "true"
-            class_type = request.POST.get("class_type", "Yoga")
-            instructor = request.POST.get("instructor", "Admin")
-
             date_str = request.POST.get("date")
             date_val = (
                 datetime.strptime(date_str, "%Y-%m-%d").date()
                 if date_str else now().date()
             )
 
-            fee = SESSION_FEE if is_present else 0
+            class_type = request.POST.get("class_type", "Yoga")
+            instructor = request.POST.get("instructor", "Admin")
+            status = request.POST.get("status", "absent").lower()
+
+            session_status = 'normal'
+            is_present = False
+            fee = 0
+
+            if status in ['frozen', 'postponed']:
+                session_status = status
+            else:
+                is_present = (status == 'present')
+                fee = SESSION_FEE if is_present else 0
 
             Attendance.objects.using('mysql_db').update_or_create(
                 student_id=student_id,
                 date=date_val,
                 class_type=class_type,
                 defaults={
-                    "is_present": is_present,
-                    "instructor": instructor,
-                    "fee": fee
+                    'is_present': is_present,
+                    'session_status': session_status,
+                    'instructor': instructor,
+                    'fee': fee
                 }
             )
 
@@ -416,28 +424,28 @@ def save_attendance(request):
         except Exception as e:
             return JsonResponse({'success': False, 'error': str(e)})
 
-
 @instructor_required
 @csrf_exempt
 def delete_attendance(request, id):
+    if request.method != "POST":
+        return JsonResponse({"success": False, "error": "Invalid method"}, status=405)
+
     try:
-        record = get_object_or_404(Attendance.objects.using('mysql_db'), id=id)
+        record = get_object_or_404(
+            Attendance.objects.using('mysql_db'),
+            id=id
+        )
         record.delete()
         return JsonResponse({"success": True, "message": "Attendance deleted"})
     except Exception as e:
         return JsonResponse({"success": False, "error": str(e)})
-
-
 
 @require_GET
 def attendance_data_api(request):
     student_id = request.session.get('student_id')
 
     if not student_id:
-        return JsonResponse(
-            {"error": "Student not logged in"},
-            status=401
-        )
+        return JsonResponse({"error": "Student not logged in"}, status=401)
 
     student = get_object_or_404(
         Student.objects.using('mysql_db'),
@@ -446,12 +454,16 @@ def attendance_data_api(request):
 
     attendance_records = Attendance.objects.using('mysql_db').filter(student=student)
 
-    total_days = attendance_records.count()
-    present_days = attendance_records.filter(is_present=True).count()
+    # ---- stats (exclude frozen/postponed) ----
+    normal_sessions = attendance_records.filter(session_status='normal')
+
+    total_days = normal_sessions.count()
+    present_days = normal_sessions.filter(is_present=True).count()
     absent_days = total_days - present_days
     attendance_rate = round((present_days / total_days) * 100, 2) if total_days else 0
 
-    monthly = attendance_records.annotate(
+    # ---- monthly present count ----
+    monthly = normal_sessions.annotate(
         month=ExtractMonth('date')
     ).values('month').annotate(
         present_count=Count('id', filter=Q(is_present=True))
@@ -461,10 +473,15 @@ def attendance_data_api(request):
     for m in monthly:
         monthly_counts[m['month'] - 1] = m['present_count']
 
-    attendance_by_date = {
-        record.date.strftime("%Y-%m-%d"): 1 if record.is_present else 0
-        for record in attendance_records
-    }
+    # ---- attendance calendar ----
+    attendance_by_date = {}
+    for record in attendance_records:
+        if record.session_status != 'normal':
+            attendance_by_date[record.date.strftime("%Y-%m-%d")] = record.session_status
+        else:
+            attendance_by_date[record.date.strftime("%Y-%m-%d")] = (
+                'present' if record.is_present else 'absent'
+            )
 
     return JsonResponse({
         "total_days": total_days,
@@ -474,25 +491,39 @@ def attendance_data_api(request):
         "attendance_by_date": attendance_by_date,
         "monthly": monthly_counts
     })
+
 @instructor_required
 def export_attendance(request):
     response = HttpResponse(content_type='text/csv')
     response['Content-Disposition'] = 'attachment; filename="attendance.csv"'
 
     writer = csv.writer(response)
-    writer.writerow(['ID', 'Student', 'Date', 'Status'])
+    writer.writerow(['ID', 'Student', 'Date', 'Status', 'Instructor', 'Class Type'])
 
-    attendances = Attendance.objects.using('mysql_db').all().select_related('student')
+    attendances = (
+        Attendance.objects.using('mysql_db')
+        .select_related('student')
+        .all()
+        .order_by('date')
+    )
 
     for record in attendances:
+        if record.session_status != 'normal':
+            status = record.session_status.capitalize()
+        else:
+            status = 'Present' if record.is_present else 'Absent'
+
         writer.writerow([
             record.id,
             record.student.name,
             record.date,
-            'Present' if record.is_present else 'Absent'
+            status,
+            record.instructor,
+            record.class_type
         ])
 
     return response
+
 @instructor_required
 def add_legacy_student(request):
     if request.method == "POST":
@@ -613,7 +644,13 @@ def update_fee_status(request):
     try:
         data = json.loads(request.body)
         student_id = data.get("student_id")
-        amount = data.get("amount", 0)
+        amount = data.get("amount")
+
+        if not student_id or not amount:
+            return JsonResponse(
+                {"success": False, "error": "Missing student_id or amount"},
+                status=400
+            )
 
         student = Student.objects.get(id=student_id)
 
@@ -624,7 +661,7 @@ def update_fee_status(request):
 
         student.fees_paid = True
         student.last_fee_paid_on = now()
-        student.save()
+        student.save(update_fields=["fees_paid", "last_fee_paid_on"])
 
         return JsonResponse({
             "success": True,
@@ -637,7 +674,11 @@ def update_fee_status(request):
     except Exception as e:
         return JsonResponse({"success": False, "error": str(e)}, status=500)
 def paid_students_api(request):
-    payments = FeePayment.objects.select_related("student").order_by("-paid_on")
+    payments = (
+        FeePayment.objects
+        .select_related("student")
+        .order_by("-paid_on")
+    )
 
     data = []
     for p in payments:
@@ -648,4 +689,4 @@ def paid_students_api(request):
             "paid_on": p.paid_on.strftime("%d %b %Y, %I:%M %p")
         })
 
-    return JsonResponse({"payments": data})
+    return JsonResponse({"payments": data}, safe=False)

@@ -74,7 +74,27 @@ table.calendar { width:100%; max-width:720px; margin:auto; border-collapse:colla
 table.calendar th { background:var(--lavender-dark); color:white; padding:14px; font-weight:600; }
 table.calendar td { height:80px; border:1px solid var(--lavender-soft); text-align:center; cursor:pointer; font-size:16px; transition:.2s; }
 table.calendar td:hover { background:var(--lavender-soft); }
-.present { background:#69be66 !important; } .absent { background:#ce3434 !important; } .no-record { background:var(--bg-main); cursor:not-allowed; }
+td.present {
+  background: #69be66 !important;
+}
+
+td.absent {
+  background: #ce3434 !important;
+}
+
+td.frozen {
+  background: #60a5fa !important; /* blue */
+  color: white;
+}
+
+td.postponed {
+  background: #fbbf24 !important; /* yellow */
+  color: black;
+}
+td.no-record {
+  background: var(--bg-main);
+  cursor: pointer;
+}
 
 /* FOOTER */
 footer { margin-top:50px; padding:15px; text-align:center; background:var(--lavender-dark); color:white; font-size:14px; }
@@ -131,6 +151,96 @@ footer { margin-top:50px; padding:15px; text-align:center; background:var(--lave
       <li>Gender: {{ student.gender }}</li>
     </ul>
   </div>
+<div id="studentModal" class="modal">
+  <div class="modal-content">
+    <span class="close">&times;</span>
+    <h2>Student Info</h2>
+
+    <p>Name: <span id="infoName"></span></p>
+    <p>Email: <span id="infoEmail"></span></p>
+    <p>Age: <span id="infoAge"></span></p>
+    <p>Gender: <span id="infoGender"></span></p>
+
+    <hr>
+
+    <label>Legacy Sessions</label>
+    <input id="legacySessions" type="number">
+
+    <label>Legacy Amount</label>
+    <input id="legacyAmount" type="number">
+
+    <button id="saveLegacyBtn">Save Legacy</button>
+    <p id="legacyStatus"></p>
+  </div>
+</div>
+<!-- FEEDBACK MODAL -->
+<div id="feedbackOverlay" class="modal">
+  <div class="modal-content" style="max-width:700px;">
+    <span class="close" onclick="closeFeedback()">&times;</span>
+
+    <h2>💬 Student Feedback</h2>
+
+    {% if feedbacks %}
+      <div style="max-height:400px;overflow-y:auto;">
+       {% for f in feedbacks %}
+  <div class="feedback-card">
+    <h4>{{ f.name }}</h4>
+    <p>{{ f.description }}</p>
+    <small>{{ f.date }}</small>
+  </div>
+{% empty %}
+  <p>No feedback yet</p>
+{% endfor %}
+      </div>
+    {% else %}
+      <p>No feedback submitted yet.</p>
+    {% endif %}
+  </div>
+</div>
+
+
+<!-- PAID MODAL -->
+<div id="paidModal" class="modal">
+  <div class="modal-content">
+    <span class="close" onclick="closePaidModal()">&times;</span>
+    <h2>Paid Records</h2>
+
+    <table style="width:100%;border-collapse:collapse;">
+      <thead>
+        <tr>
+          <th>Student</th>
+          <th>Email</th>
+          <th>Amount</th>
+          <th>Date</th>
+        </tr>
+      </thead>
+      <tbody id="paidTableBody"></tbody>
+    </table>
+  </div>
+</div>
+<!-- LEGACY MODAL -->
+<div id="studentModal" class="modal">
+  <div class="modal-content">
+    <span class="close">&times;</span>
+
+    <h2 id="infoName">Student</h2>
+    <p id="infoEmail"></p>
+
+    <label>Total Sessions</label>
+    <input id="legacySessions" type="number" style="width:100%;padding:8px;margin-bottom:10px;">
+
+    <label>Total Amount (₹)</label>
+    <input id="legacyAmount" type="number" style="width:100%;padding:8px;margin-bottom:10px;">
+
+    <button id="saveLegacyBtn"
+      style="width:100%;padding:10px;border:none;border-radius:12px;background:#8b7cf6;color:white;">
+      💾 Save Legacy
+    </button>
+
+    <p id="legacyStatus" style="margin-top:10px;"></p>
+  </div>
+</div>
+
 
   <!-- Student Fee Cards -->
   <div class="student-fees-grid">
@@ -408,7 +518,12 @@ function renderCalendar(year, month){
   for(let i=0;i<firstDay;i++) html += '<td class="no-record"></td>';
   for(let d=1; d<=daysInMonth; d++){
     const dateStr = `${year}-${String(month+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
-    let cls = attendance[dateStr]=='present'||attendance[dateStr]=='1'?'present':attendance[dateStr]=='absent'||attendance[dateStr]=='0'?'absent':'';
+    let cls = '';
+if (attendance[dateStr] === 'present' || attendance[dateStr] === '1') cls = 'present';
+else if (attendance[dateStr] === 'absent' || attendance[dateStr] === '0') cls = 'absent';
+else if (attendance[dateStr] === 'frozen') cls = 'frozen';
+else if (attendance[dateStr] === 'postponed') cls = 'postponed';
+
     html += `<td class="${cls}" data-date="${dateStr}">${d}</td>`;
     if((firstDay+d)%7===0) html += '</tr><tr>';
   }
@@ -416,11 +531,19 @@ function renderCalendar(year, month){
   calendarDiv.innerHTML = html;
   document.getElementById('monthYear').textContent = new Date(year, month).toLocaleString('default',{month:'long',year:'numeric'});
   document.querySelectorAll('td[data-date]').forEach(cell=>{
-    cell.onclick=()=>{
-      if(cell.classList.contains('present')){cell.classList.remove('present');cell.classList.add('absent');}
-      else if(cell.classList.contains('absent')) cell.classList.remove('absent');
-      else cell.classList.add('present');
-    };
+cell.onclick = () => {
+  const states = ['present', 'absent', 'frozen', 'postponed','no-record'];
+  let current = states.find(s => cell.classList.contains(s)) || 'no-record';
+  cell.classList.remove(...states);
+
+  if (current === undefined) {
+    cell.classList.add('present');
+  } else {
+    const next = states[(states.indexOf(current) + 1) % states.length];
+    cell.classList.add(next);
+  }
+};
+
   });
 }
 
@@ -433,7 +556,13 @@ document.getElementById('nextMonth').onclick=()=>{currentMonth++; if(currentMont
 document.getElementById('saveAttendanceBtn').addEventListener('click',()=>{
   const attendanceData = [];
   document.querySelectorAll('td[data-date]').forEach(cell=>{
-    let status = cell.classList.contains('present')?'present':cell.classList.contains('absent')?'absent':null;
+    let status =
+  cell.classList.contains('present') ? 'present' :
+  cell.classList.contains('absent') ? 'absent' :
+  cell.classList.contains('frozen') ? 'frozen' :
+  cell.classList.contains('postponed') ? 'postponed' :
+  null;
+
     if(status) attendanceData.push({student_id:studentId,date:cell.dataset.date,class_type:'Yoga',instructor:'Palak',status});
   });
   fetch('/save-attendance/',{

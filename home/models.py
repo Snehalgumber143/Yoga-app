@@ -95,11 +95,22 @@ class FeePayment(models.Model):
 class Attendance(models.Model):
     student = models.ForeignKey(Student, on_delete=models.CASCADE)
     date = models.DateField()
+
     is_present = models.BooleanField(default=False)
+
+    session_status = models.CharField(
+        max_length=12,
+        choices=[
+            ('normal', 'Normal'),
+            ('frozen', 'Frozen'),
+            ('postponed', 'Postponed'),
+        ],
+        default='normal'
+    )
+
     class_type = models.CharField(max_length=50, default='yoga')
     instructor = models.CharField(max_length=50)
 
-    
     fee = models.DecimalField(
         max_digits=7,
         decimal_places=2,
@@ -107,9 +118,11 @@ class Attendance(models.Model):
     )
 
     created_at = models.DateTimeField(auto_now_add=True)
+
     class Meta:
         unique_together = ('student', 'date', 'class_type')
 
-    
     def __str__(self):
+        if self.session_status != 'normal':
+            return f"{self.student.name} - {self.date} - {self.session_status.title()}"
         return f"{self.student.name} - {self.date} - {'Present' if self.is_present else 'Absent'}"

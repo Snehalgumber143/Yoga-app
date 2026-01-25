@@ -4,7 +4,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Attendance - ZenFlow Yoga Studio</title>
+<title>Attendance -  Yoga Dhara Studio</title>
 <link rel="icon" type="image/x-icon" href="{% static 'hello/images/favicon.png' %}">
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <style>
@@ -300,6 +300,15 @@ body {
   background: #ff7a7a;
   color: white;
 }
+.calendar-day.frozen {
+    background-color: #09e5ec; /* gray */
+    color: #fff;
+}
+
+.calendar-day.postponed {
+    background-color: #f59e0b; /* amber */
+    color: #fff;
+}
 
 .calendar-day.today {
   border: 2px solid #7c6ae6;
@@ -336,6 +345,15 @@ body {
 
 .legend-color.absent {
   background: #ff7a7a;
+}
+.legend-color.frozen {
+    background-color: #09e5ec; /* gray */
+    color: #fff;
+}
+
+.legend-color.postponed {
+    background-color: #f59e0b; /* amber */
+    color: #fff;
 }
 
 /* RESPONSIVE */
@@ -421,16 +439,24 @@ body {
             <select class="month-selector" id="monthSelector"></select>
         </div>
         <div class="calendar-grid" id="calendarGrid" data-student-id="{{ student.id }}"></div>
-        <div class="legend">
-            <div class="legend-item">
-                <div class="legend-color present"></div>
-                <span>Present</span>
-            </div>
-            <div class="legend-item">
-                <div class="legend-color absent"></div>
-                <span>Absent</span>
-            </div>
-        </div>
+<div class="legend">
+    <div class="legend-item">
+        <div class="legend-color present"></div>
+        <span>Present</span>
+    </div>
+    <div class="legend-item">
+        <div class="legend-color absent"></div>
+        <span>Absent</span>
+    </div>
+    <div class="legend-item">
+        <div class="legend-color frozen"></div>
+        <span>Session Frozen</span>
+    </div>
+    <div class="legend-item">
+        <div class="legend-color postponed"></div>
+        <span>Postponed</span>
+    </div>
+</div>
     </div>
 </div>
 
@@ -508,9 +534,9 @@ function generateCalendar(attendance_by_date) {
 
         const dateKey = `${selectedYear}-${String(selectedMonth + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
 
-        if (attendance_by_date?.[dateKey] !== undefined) {
-            dayEl.classList.add(attendance_by_date[dateKey] === 1 ? 'present' : 'absent');
-        }
+        if (attendance_by_date?.[dateKey]) {
+        dayEl.classList.add(attendance_by_date[dateKey]);
+          }
 
         const today = new Date();
         if (selectedYear === today.getFullYear() && selectedMonth === today.getMonth() && day === today.getDate()) {
