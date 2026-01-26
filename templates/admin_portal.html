@@ -275,7 +275,35 @@ footer { margin-top:50px; padding:15px; text-align:center; background:var(--lave
       <button id="nextMonth">&gt;</button>
     </div>
     <div id="calendar" data-student-id="{{ student.id }}"></div>
-    <button id="saveAttendanceBtn">💾 Save Attendance</button>
+    <button id="saveAttendanceBtn" style="
+    display: block;
+    margin: 2rem auto 0;
+    padding: 0.9rem 2.8rem;
+    background: linear-gradient(135deg, var(--lavender-main), var(--lavender-dark));
+    color: white;
+    border: none;
+    border-radius: 20px;
+    font-weight: 600;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 6px 16px rgba(139,124,246,0.3);
+">
+💾 Save Attendance
+</button>
+
+<script>
+const saveBtn = document.getElementById("saveAttendanceBtn");
+saveBtn.addEventListener("mouseover", () => {
+    saveBtn.style.transform = "translateY(-2px)";
+    saveBtn.style.boxShadow = "0 8px 20px rgba(139,124,246,0.4)";
+});
+saveBtn.addEventListener("mouseout", () => {
+    saveBtn.style.transform = "translateY(0)";
+    saveBtn.style.boxShadow = "0 6px 16px rgba(139,124,246,0.3)";
+});
+</script>
+
   </div>
   {% endif %}
 </div>

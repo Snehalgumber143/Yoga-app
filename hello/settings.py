@@ -15,7 +15,11 @@ SECRET_KEY = 'django-insecure-)131@-d@+(w+%z&+uwk3igyf(hf-lkg&wnnr%7e+(24$7w&$d@
 
 DEBUG = True   # ✅ MUST be True for static files in local dev
 
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = [
+                '127.0.0.1', 'localhost'
+                'www.yogadhara.co.in'
+                'yogadhara.co.in'
+                ]
 
 
 # --------------------------------------------------
@@ -125,12 +129,13 @@ USE_TZ = True
 # --------------------------------------------------
 STATIC_URL = '/static/'
 
+# Where Django looks for your custom static files (css/js/images you write)
 STATICFILES_DIRS = [
     BASE_DIR / "static",
 ]
 
-# ⚠️ Only needed for production
-# STATIC_ROOT = BASE_DIR / "staticfiles"
+# Where Django will collect all static files for production
+STATIC_ROOT = BASE_DIR / "staticfiles"
 
 
 # --------------------------------------------------
